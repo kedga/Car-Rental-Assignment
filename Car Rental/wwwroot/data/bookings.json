@@ -1,0 +1,32 @@
+[
+  {
+    "RegistrationNumber": "ABC123",
+    "CustomerName": "John Doe",
+    "OdometerStart": 5000.0,
+    "OdometerEnd": 8000.0,
+    "StartDate": "2023-09-01T10:00:00",
+    "EndDate": "2023-09-05T14:30:00",
+    "BookingStatus": 1,
+    "TotalCost": 250.0
+  },
+  {
+    "RegistrationNumber": "XYZ789",
+    "CustomerName": "Alice Smith",
+    "OdometerStart": 3000.0,
+    "OdometerEnd": 5000.0,
+    "StartDate": "2023-08-25T09:15:00",
+    "EndDate": "2023-08-30T16:45:00",
+    "BookingStatus": 0,
+    "TotalCost": 280.0
+  },
+  {
+    "RegistrationNumber": "DEF456",
+    "CustomerName": "Bob Johnson",
+    "OdometerStart": 7000.0,
+    "OdometerEnd": 8500.0,
+    "StartDate": "2023-08-20T14:20:00",
+    "EndDate": "2023-08-25T12:30:00",
+    "BookingStatus": 2,
+    "TotalCost": 180.0
+  }
+]

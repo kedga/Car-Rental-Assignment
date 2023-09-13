@@ -1,0 +1,209 @@
+﻿@page "/"
+@using Car_Rental.Common.Interfaces
+@using Car_Rental.Common.Enums
+@using Car_Rental.Common.Classes
+@using System.Text.Json;
+@using Car_Rental.Business.Classes;
+
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject Car_Rental.Business.Classes.BookingProcessor BookingProcessor
+
+<h1>Welcome to Car Rental</h1>
+<div>
+    @errorMessage
+</div>
+<h2>Vehicles</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Vehicle</th>
+            <th>Make and model</th>
+            <th>Odometer Position</th>
+            <th>Cost Per Kilometer</th>
+            <th>Vehicle Type</th>
+            <th>Daily Rate</th>
+            <th>Rental Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Vehicles != null)
+        {
+            @foreach (var vehicle in Vehicles)
+            {
+                <tr>
+                <td>@vehicle.RegistrationNumber</td>
+                <td>@vehicle.Make</td>
+                <td>@vehicle.OdometerPosition</td>
+                <td>@vehicle.CostPerKilometer</td>
+                <td>@vehicle.VehicleType</td>
+                <td>@vehicle.DailyRate</td>
+                <td>@vehicle.BookingStatus</td>
+            </tr>
+            }
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+    </tbody>
+</table>
+
+<h2>Bookings</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Vehicle</th>
+            <th>Customer Name</th>
+            <th>Odometer Start</th>
+            <th>Odometer End</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Total Cost</th>
+            <th>Booking Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Bookings != null)
+        {
+            @foreach (var booking in Bookings)
+            {
+                <tr>
+                    <td>
+                        <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Vehicle Information" data-bs-placement="bottom" data-bs-content="
+                            <strong>@booking.Vehicle.Make</strong>, @booking.Vehicle.VehicleType<br>
+                            <strong>Cost per km:</strong> @booking.Vehicle.CostPerKilometer<br>
+                            <strong>Daily rate:</strong> @booking.Vehicle.DailyRate">
+                            @booking.Vehicle.RegistrationNumber
+                        </button>
+                    </td>
+                    <td>@booking.CustomerName</td>
+                    <td>@booking.OdometerStart</td>
+                    <td>@booking.OdometerEnd</td>
+                    <td>@booking.StartDate</td>
+                    <td>@booking.EndDate</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Cost breakdown" data-bs-placement="bottom" data-bs-content="
+                            <strong>Total km cost for @booking.TotalKilometers km</strong><br>
+                            @booking.TotalKilometerCost<strong><br>Total daily cost for @booking.RentalDays days</strong><br>
+                            @booking.TotalDailyCost">
+                            @booking.TotalCost
+                        </button>
+                    </td>
+                    <td>@booking.BookingStatus</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+
+    </tbody>
+</table>
+
+
+@* <button type="button" class="btn btn-lg btn-danger" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Popover title" data-bs-placement="bottom" data-bs-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
+<button @onclick="ReinitializePopovers">Reinitialize Popovers</button> *@
+
+<h2>Customers</h2>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Social Security Number</th>
+            <th>Last Name</th>
+            <th>First Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Customers != null)
+        {
+            @foreach (var customer in Customers)
+            {
+                <tr>
+                    <td>@customer.SocialSecurityNumber</td>
+                    <td>@customer.LastName</td>
+                    <td>@customer.FirstName</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+
+    </tbody>
+</table>
+<div id="popoverContent" style="display: none;">
+    <table class="table table-bordered">
+        <tr>
+            <th>Attribute</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Vehicle Make</td>
+        </tr>
+        <tr>
+            <td>Registration Number</td>
+        </tr>
+        <tr>
+            <td>Cost Per Kilometer</td>
+        </tr>
+        <!-- Add more rows for other attributes -->
+    </table>
+</div>
+<script>
+    new bootstrap.Popover(document.body, {
+        selector: '[data-bs-toggle="popover"]',
+        container: 'body'
+        html: true,
+        //content: (() => document.querySelector('#popoverContent'))
+    });
+
+</script>
+@code {
+    string errorMessage = "errormessage is unchanged";
+    private IEnumerable<IBooking> Bookings { get; set; }
+    private IEnumerable<IPerson> Customers { get; set; }
+    private IEnumerable<IVehicle> Vehicles { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await BookingProcessor.GetAllDataAsync();
+            Bookings = BookingProcessor.GetBookings();
+            Customers = BookingProcessor.GetCustomers();
+            Vehicles = BookingProcessor.GetVehicles();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+        errorMessage = BookingProcessor._dataService.GetErrorMessage();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await ReinitializePopovers();
+    }
+    private string GetVehicleInfo(IVehicle vehicle)
+    {
+        if (vehicle != null)
+        {
+            return $@"Vehicle Make: {vehicle.Make}
+            Registration Number: {vehicle.RegistrationNumber}
+            Cost Per Kilometer: {vehicle.CostPerKilometer}
+            ...";
+        }
+        else
+        {
+            return "No vehicle information available";
+        }
+    }
+    private async Task ReinitializePopovers()
+    {
+        await JSRuntime.InvokeVoidAsync("reinitializePopovers");
+    }
+
+
+}

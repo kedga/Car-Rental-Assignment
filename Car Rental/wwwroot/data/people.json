@@ -1,0 +1,22 @@
+[
+  {
+    "SocialSecurityNumber": "123-45-6789",
+    "FirstName": "John",
+    "LastName": "Doe"
+  },
+  {
+    "SocialSecurityNumber": "987-65-4321",
+    "FirstName": "Jane",
+    "LastName": "Smith"
+  },
+  {
+    "SocialSecurityNumber": "456-78-9012",
+    "FirstName": "David",
+    "LastName": "Johnson"
+  },
+  {
+    "SocialSecurityNumber": "789-01-2345",
+    "FirstName": "Emily",
+    "LastName": "Brown"
+  }
+]

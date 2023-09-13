@@ -1,0 +1,38 @@
+[
+  {
+    "RegistrationNumber": "ABC123",
+    "Make": "Toyota Camry",
+    "OdometerPosition": 50000,
+    "CostPerKilometer": 0.15,
+    "VehicleType": 0,
+    "DailyRate": 30.0,
+    "BookingStatus": 0
+  },
+  {
+    "RegistrationNumber": "XYZ789",
+    "Make": "Ford Transit",
+    "OdometerPosition": 60000,
+    "CostPerKilometer": 0.12,
+    "VehicleType": 1,
+    "DailyRate": 35.0,
+    "BookingStatus": 1
+  },
+  {
+    "RegistrationNumber": "DEF456",
+    "Make": "Harley-Davidson Sportster",
+    "OdometerPosition": 15000,
+    "CostPerKilometer": 0.20,
+    "VehicleType": 2,
+    "DailyRate": 25.0,
+    "BookingStatus": 0
+  },
+  {
+    "RegistrationNumber": "GHI789",
+    "Make": "Subaru Outback",
+    "OdometerPosition": 75000,
+    "CostPerKilometer": 0.14,
+    "VehicleType": 3,
+    "DailyRate": 40.0,
+    "BookingStatus": 1
+  }
+]

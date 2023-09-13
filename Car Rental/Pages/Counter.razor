@@ -1,0 +1,48 @@
+﻿@page "/counter"
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<button type="button" class="btn btn-lg btn-danger" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Popover title" data-bs-placement="bottom" data-bs-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
+
+<h2>Dummy Table</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <tr>
+                <td>@i</td>
+                <td>Name @i</td>
+                <td>
+                    <button type="button" class="btn btn-lg btn-danger" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Popover title" data-bs-placement="bottom" data-bs-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+    const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+
+</script>
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}
