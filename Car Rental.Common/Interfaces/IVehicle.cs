@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Car_Rental.Common.Interfaces;
 
-public interface IVehicle
+public interface IVehicle : IDataObject
 {
     string RegistrationNumber { get; set; }
     string Make { get; set; }

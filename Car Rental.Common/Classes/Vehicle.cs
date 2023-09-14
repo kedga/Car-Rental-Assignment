@@ -19,8 +19,11 @@ public class Vehicle : IVehicle
 	public string RegistrationNumber { get; set; }
 	public string Make { get; set; }
 	public double OdometerPosition { get; set; }
-	public double CostPerKilometer { get; set; }
-	public VehicleType VehicleType { get; set; }
+    public double? OdometerPositionNullable { get; set; }
+    public double CostPerKilometer { get; set; }
+    public double? CostPerKilometerNullable { get; set; }
+    public VehicleType VehicleType { get; set; }
     public double DailyRate { get; set; }
+    public double? DailyRateNullable { get; set; }
     public BookingStatuses BookingStatus { get; set; }
 }

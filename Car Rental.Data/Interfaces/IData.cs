@@ -10,8 +10,8 @@ namespace Car_Rental.Data.Interfaces;
 
 public interface IData
 {
-    Task <IEnumerable<IBooking>> GetBookingsAsync();
-    Task <IEnumerable<IVehicle>> GetVehiclesAsync();
-    Task<IEnumerable<IPerson>> GetPeopleAsync();
+    Task InitializeDataAsync();
+    public IEnumerable<T> GetDataObjectsOfType<T>();
     string GetErrorMessage();
+    public void AddDataObject(IDataObject dataObject);
 }

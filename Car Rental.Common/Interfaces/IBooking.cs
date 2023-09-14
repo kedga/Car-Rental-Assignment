@@ -8,7 +8,7 @@ using Car_Rental.Common.Enums;
 
 namespace Car_Rental.Common.Interfaces;
 
-public interface IBooking
+public interface IBooking : IDataObject
 {
     string RegistrationNumber { get; set; }
     string CustomerName { get; }

@@ -10,9 +10,19 @@
 @inject Car_Rental.Business.Classes.BookingProcessor BookingProcessor
 
 <h1>Welcome to Car Rental</h1>
-<div>
-    @errorMessage
+<div class="container">
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @errorMessage
+            <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="ClearErrorMessage">
+            
+            </button>
+        </div>
+
+    }
 </div>
+
 <h2>Vehicles</h2>
 <table class="table table-bordered">
     <thead>
@@ -27,6 +37,34 @@
         </tr>
     </thead>
     <tbody>
+        <!-- Input row for adding a new vehicle -->
+        <tr>
+            <td><input @bind="newVehicle.RegistrationNumber" class="form-control" placeholder="Registration Number" /></td>
+            <td><input @bind="newVehicle.Make" class="form-control" placeholder="Make and Model" /></td>
+            <td><input @bind="OdometerPositionNullable" class="form-control" placeholder="Odometer Position" type="number" /></td>
+            <td><input @bind="CostPerKilometerNullable" class="form-control" placeholder="Cost Per Kilometer" type="number" /></td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="vehicleTypeDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @newVehicle.VehicleType
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="vehicleTypeDropdown">
+                        @foreach (var vehicleType in Enum.GetValues(typeof(VehicleType)))
+                        {
+                            <button class="dropdown-item" @onclick="() => SelectVehicleType((VehicleType)vehicleType)">@vehicleType</button>
+                        }
+                    </div>
+                </div>
+
+
+            </td>
+            <td><input @bind="DailyRateNullable" class="form-control" placeholder="Daily Rate" type="number" /></td>
+            <td><input @bind="newVehicle.BookingStatus" class="form-control" placeholder="Booking Status" /></td>
+            <td><button class="btn btn-success" @onclick="AddNewVehicle">Add</button></td>
+        </tr>
+
+
+        <!-- Existing vehicles -->
         @if (Vehicles != null)
         {
             @foreach (var vehicle in Vehicles)
@@ -72,8 +110,8 @@
                     <td>
                         <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Vehicle Information" data-bs-placement="bottom" data-bs-content="
                             <strong>@booking.Vehicle.Make</strong>, @booking.Vehicle.VehicleType<br>
-                            <strong>Cost per km:</strong> @booking.Vehicle.CostPerKilometer<br>
-                            <strong>Daily rate:</strong> @booking.Vehicle.DailyRate">
+                            <strong>Cost per km:</strong> @FormatAsCurrency(@booking.Vehicle.CostPerKilometer)<br>
+                            <strong>Daily rate:</strong> @FormatAsCurrency(@booking.Vehicle.DailyRate)">
                             @booking.Vehicle.RegistrationNumber
                         </button>
                     </td>
@@ -83,11 +121,12 @@
                     <td>@booking.StartDate</td>
                     <td>@booking.EndDate</td>
                     <td>
-                        <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Cost breakdown" data-bs-placement="bottom" data-bs-content="
+                        <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Price breakdown" data-bs-placement="bottom" data-bs-content="
                             <strong>Total km cost for @booking.TotalKilometers km</strong><br>
-                            @booking.TotalKilometerCost<strong><br>Total daily cost for @booking.RentalDays days</strong><br>
-                            @booking.TotalDailyCost">
-                            @booking.TotalCost
+                            @FormatAsCurrency(@booking.TotalKilometerCost)<br>
+                            <strong>Total daily cost for @booking.RentalDays days</strong><br>
+                            @FormatAsCurrency(@booking.TotalDailyCost)">
+                            @FormatAsCurrency(@booking.TotalCost)
                         </button>
                     </td>
                     <td>@booking.BookingStatus</td>
@@ -157,53 +196,71 @@
         selector: '[data-bs-toggle="popover"]',
         container: 'body'
         html: true,
-        //content: (() => document.querySelector('#popoverContent'))
     });
 
 </script>
 @code {
+    IVehicle newVehicle = new Vehicle("", "");
+    double? OdometerPositionNullable;
+    double? CostPerKilometerNullable;
+    double? DailyRateNullable;
+    private VehicleType selectedVehicleType;
     string errorMessage = "errormessage is unchanged";
-    private IEnumerable<IBooking> Bookings { get; set; }
-    private IEnumerable<IPerson> Customers { get; set; }
-    private IEnumerable<IVehicle> Vehicles { get; set; }
-
+    // private IEnumerable<IBooking> Bookings { get; set; }
+    // private IEnumerable<IPerson> Customers { get; set; }
+    // private IEnumerable<IVehicle> Vehicles { get; set; }
+    List<IBooking> Bookings = new List<IBooking>();
+    List<IPerson> Customers = new List<IPerson>();
+    List<IVehicle> Vehicles = new List<IVehicle>();
+    string[] dataToLoad = { "vehicles", "people", "bookings" };
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            await BookingProcessor.GetAllDataAsync();
-            Bookings = BookingProcessor.GetBookings();
-            Customers = BookingProcessor.GetCustomers();
-            Vehicles = BookingProcessor.GetVehicles();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"An error occurred: {ex.Message}";
-        }
+        await BookingProcessor.InitializeDataAsync();
+        Bookings = BookingProcessor.GetBookings().ToList();
+        Customers = BookingProcessor.GetCustomers().ToList();
+        Vehicles = BookingProcessor.GetVehicles().ToList();
         errorMessage = BookingProcessor._dataService.GetErrorMessage();
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await ReinitializePopovers();
+        await JSRuntime.InvokeVoidAsync("reinitializePopovers");
     }
-    private string GetVehicleInfo(IVehicle vehicle)
+    private void SelectVehicleType(VehicleType vehicleType)
     {
-        if (vehicle != null)
+        selectedVehicleType = vehicleType;
+        newVehicle.VehicleType = vehicleType;
+    }
+
+    private void AddNewVehicle()
+    {
+        if (string.IsNullOrWhiteSpace(newVehicle.RegistrationNumber) ||
+            string.IsNullOrWhiteSpace(newVehicle.Make) ||
+            OdometerPositionNullable < 0 ||
+            CostPerKilometerNullable <= 0 ||
+            DailyRateNullable <= 0)
         {
-            return $@"Vehicle Make: {vehicle.Make}
-            Registration Number: {vehicle.RegistrationNumber}
-            Cost Per Kilometer: {vehicle.CostPerKilometer}
-            ...";
+            errorMessage = "Please fill in all required fields and ensure numeric values are positive.";
         }
         else
         {
-            return "No vehicle information available";
+            newVehicle.CostPerKilometer = CostPerKilometerNullable ?? 0.0;
+            newVehicle.DailyRate = DailyRateNullable ?? 0.0;
+            newVehicle.OdometerPosition = OdometerPositionNullable ?? 0.0;
+            BookingProcessor.AddDataObject(newVehicle);
+            Vehicles = BookingProcessor.GetVehicles().ToList();
+            //errorMessage = $"newVehicle is of type {newVehicle.GetType()}";
+            // Vehicles.Add(newVehicle);
+            newVehicle = new Vehicle("", "");
+            OdometerPositionNullable = CostPerKilometerNullable = DailyRateNullable = null;
+            //errorMessage = "";
+            errorMessage = BookingProcessor._dataService.GetErrorMessage();
         }
     }
-    private async Task ReinitializePopovers()
+    private void ClearErrorMessage()
     {
-        await JSRuntime.InvokeVoidAsync("reinitializePopovers");
+        errorMessage = "";
     }
 
 
+    public string FormatAsCurrency(double amount) => string.Format("${0:N2}", amount);
 }

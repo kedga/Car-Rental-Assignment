@@ -13,42 +13,28 @@ namespace Car_Rental.Business.Classes;
 public class BookingProcessor
 {
     public readonly IData _dataService;
-    private IEnumerable<IVehicle>? _vehicles;
-    private IEnumerable<IBooking>? _bookings;
-    private IEnumerable<IPerson>? _people;
-    public BookingProcessor(IData dataService)
-    {
-        _dataService = dataService;
-    }
+    public BookingProcessor(IData dataService) => _dataService = dataService;
 
-    public async Task GetAllDataAsync()
+    
+    public async Task InitializeDataAsync()
     {
-        _bookings = await _dataService.GetBookingsAsync();
-        _vehicles = await _dataService.GetVehiclesAsync();
-        _people = await _dataService.GetPeopleAsync();
+        await _dataService.InitializeDataAsync();
         MatchBookingsWithVehicles();
         SetOdometerPosition();
         CalculateTotalCost();
     }
-    public IEnumerable<IBooking> GetBookings()
-    {
-        return _bookings;
-    }
-
-    public IEnumerable<IVehicle> GetVehicles()
-    {
-        return _vehicles;
-    }
-
-    public IEnumerable<IPerson> GetCustomers()
-    {
-        return _people;
-    }
+    public IEnumerable<IBooking> GetBookings() => _dataService.GetDataObjectsOfType<IBooking>();
+    public IEnumerable<IVehicle> GetVehicles() => _dataService.GetDataObjectsOfType<IVehicle>();
+    public IEnumerable<IPerson> GetCustomers() => _dataService.GetDataObjectsOfType<IPerson>();
+    public void AddDataObject(IDataObject dataObject) => _dataService.AddDataObject(dataObject);
 
     private void MatchBookingsWithVehicles()
     {
-        var joinedBookings = from booking in _bookings
-                             join vehicle in _vehicles on booking.RegistrationNumber equals vehicle.RegistrationNumber
+        var bookings = _dataService.GetDataObjectsOfType<IBooking>();
+        var vehicles = _dataService.GetDataObjectsOfType<IVehicle>();
+
+        var joinedBookings = from booking in bookings
+                             join vehicle in vehicles on booking.RegistrationNumber equals vehicle.RegistrationNumber
                              select new { Booking = booking, Vehicle = vehicle };
 
         foreach (var item in joinedBookings)
@@ -59,7 +45,8 @@ public class BookingProcessor
 
     private void SetOdometerPosition()
     {
-        var groupedBookings = _bookings.GroupBy(booking => booking.Vehicle);
+        var bookings = _dataService.GetDataObjectsOfType<IBooking>();
+        var groupedBookings = bookings.GroupBy(booking => booking.Vehicle);
 
         foreach (var group in groupedBookings)
         {
@@ -75,7 +62,9 @@ public class BookingProcessor
 
     private void CalculateTotalCost()
     {
-        foreach (var booking in _bookings)
+        var bookings = _dataService.GetDataObjectsOfType<IBooking>();
+
+        foreach (var booking in bookings)
         {
             if (booking.Vehicle != null)
             {
