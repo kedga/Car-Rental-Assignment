@@ -20,12 +20,12 @@ public class BookingProcessor
     {
         await _dataService.InitializeDataAsync();
         MatchBookingsWithVehicles();
-        SetOdometerPosition();
-        CalculateTotalCost();
+        _dataService.PrintDataObjects();
+        await Console.Out.WriteLineAsync("XXXXXXXXX");
+        //SetOdometerPosition();
+        //CalculateTotalCost();
     }
-    public IEnumerable<IBooking> GetBookings() => _dataService.GetDataObjectsOfType<IBooking>();
-    public IEnumerable<IVehicle> GetVehicles() => _dataService.GetDataObjectsOfType<IVehicle>();
-    public IEnumerable<IPerson> GetCustomers() => _dataService.GetDataObjectsOfType<IPerson>();
+    public IEnumerable<T> GetDataObjectsOfType<T>() where T : class => _dataService.GetDataObjectsOfType<T>();
     public void AddDataObject(IDataObject dataObject) => _dataService.AddDataObject(dataObject);
 
     private void MatchBookingsWithVehicles()
@@ -46,17 +46,20 @@ public class BookingProcessor
     private void SetOdometerPosition()
     {
         var bookings = _dataService.GetDataObjectsOfType<IBooking>();
+
         var groupedBookings = bookings.GroupBy(booking => booking.Vehicle);
 
         foreach (var group in groupedBookings)
         {
             var latestBooking = group.OrderByDescending(booking => booking.EndDate).FirstOrDefault();
-
             if (latestBooking != null)
             {
                 latestBooking.Vehicle.OdometerPosition = latestBooking.OdometerEnd;
+                Console.WriteLine($"Updated odometer position for vehicle: {latestBooking.Vehicle.RegistrationNumber}");
+
             }
         }
+        Console.WriteLine("set odometer done");
     }
 
 

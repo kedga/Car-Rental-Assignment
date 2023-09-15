@@ -14,4 +14,5 @@ public interface IData
     public IEnumerable<T> GetDataObjectsOfType<T>();
     string GetErrorMessage();
     public void AddDataObject(IDataObject dataObject);
+    public void PrintDataObjects();
 }

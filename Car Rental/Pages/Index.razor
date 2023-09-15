@@ -4,6 +4,8 @@
 @using Car_Rental.Common.Classes
 @using System.Text.Json;
 @using Car_Rental.Business.Classes;
+@using System.Text.RegularExpressions;
+
 
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
@@ -149,12 +151,19 @@
 <table class="table table-bordered table-hover">
     <thead>
         <tr>
-            <th>Social Security Number</th>
+            <th>Personal Identity Number</th>
             <th>Last Name</th>
             <th>First Name</th>
+            <th></th> <!-- Add an empty column for the "Add" button -->
         </tr>
     </thead>
     <tbody>
+        <tr>
+            <td><input @bind="ssn" @bind:event="oninput" @bind:after="FormatSsn" class="form-control" placeholder="Personal identity number" pattern="^[0-9-]*$" maxlength="13" /></td>
+            <td><input @bind="newCustomer.LastName" class="form-control" placeholder="Last Name" /></td>
+            <td><input @bind="newCustomer.FirstName" class="form-control" placeholder="First Name" /></td>
+            <td><button class="btn btn-success" @onclick="AddNewCustomer">Add</button></td>
+        </tr>
         @if (Customers != null)
         {
             @foreach (var customer in Customers)
@@ -163,16 +172,14 @@
                     <td>@customer.SocialSecurityNumber</td>
                     <td>@customer.LastName</td>
                     <td>@customer.FirstName</td>
+                    <td></td> <!-- Empty column for alignment -->
                 </tr>
             }
         }
-        else
-        {
-            <p>Loading...</p>
-        }
-
     </tbody>
 </table>
+
+
 <div id="popoverContent" style="display: none;">
     <table class="table table-bordered">
         <tr>
@@ -201,9 +208,12 @@
 </script>
 @code {
     IVehicle newVehicle = new Vehicle("", "");
+    IPerson newCustomer = new Person("","","");
     double? OdometerPositionNullable;
     double? CostPerKilometerNullable;
     double? DailyRateNullable;
+    string ssn;
+    bool validSsn = false;
     private VehicleType selectedVehicleType;
     string errorMessage = "errormessage is unchanged";
     // private IEnumerable<IBooking> Bookings { get; set; }
@@ -216,14 +226,18 @@
     protected override async Task OnInitializedAsync()
     {
         await BookingProcessor.InitializeDataAsync();
-        Bookings = BookingProcessor.GetBookings().ToList();
-        Customers = BookingProcessor.GetCustomers().ToList();
-        Vehicles = BookingProcessor.GetVehicles().ToList();
+        RefreshDataDisplayed();
         errorMessage = BookingProcessor._dataService.GetErrorMessage();
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await JSRuntime.InvokeVoidAsync("reinitializePopovers");
+    }
+    private void RefreshDataDisplayed()
+    {
+        Bookings = BookingProcessor.GetDataObjectsOfType<IBooking>().ToList();
+        Customers = BookingProcessor.GetDataObjectsOfType<IPerson>().ToList();
+        Vehicles = BookingProcessor.GetDataObjectsOfType<IVehicle>().ToList();
     }
     private void SelectVehicleType(VehicleType vehicleType)
     {
@@ -247,15 +261,59 @@
             newVehicle.DailyRate = DailyRateNullable ?? 0.0;
             newVehicle.OdometerPosition = OdometerPositionNullable ?? 0.0;
             BookingProcessor.AddDataObject(newVehicle);
-            Vehicles = BookingProcessor.GetVehicles().ToList();
-            //errorMessage = $"newVehicle is of type {newVehicle.GetType()}";
-            // Vehicles.Add(newVehicle);
+            RefreshDataDisplayed();
             newVehicle = new Vehicle("", "");
             OdometerPositionNullable = CostPerKilometerNullable = DailyRateNullable = null;
-            //errorMessage = "";
             errorMessage = BookingProcessor._dataService.GetErrorMessage();
         }
     }
+    private void AddNewCustomer()
+    {
+        if (string.IsNullOrWhiteSpace(newCustomer.LastName) ||
+            string.IsNullOrWhiteSpace(newCustomer.FirstName))
+        {
+            errorMessage = "Please fill in all required fields.";
+        }
+        // else if (!IsSwedishSsnValid(newCustomer.SocialSecurityNumber, out string formattedSsn))
+        // {
+        //     errorMessage = "Please enter a valid Swedish Personal Identity Number in 10 digit format.";
+        // }
+        else
+        {
+            newCustomer.SocialSecurityNumber = ssn;
+            BookingProcessor.AddDataObject(newCustomer);
+            RefreshDataDisplayed();
+            newCustomer = new Person("", "", "");
+            errorMessage = BookingProcessor._dataService.GetErrorMessage();
+        }
+    }
+    private void FormatSsn()
+    {
+        bool matching = false;
+        if (Regex.IsMatch(ssn, @"^(0[1-9]|[1-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])(-?[0-9]{4})$"))
+        {
+            matching = true;
+            int currentYear = DateTime.Now.Year % 100;
+            int.TryParse(ssn.Substring(0, 2), out int ssnYear);
+            if (ssnYear > currentYear)
+                ssn = "19" + ssn;
+            else
+                ssn = "20" + ssn;
+        }
+        else if (Regex.IsMatch(ssn, @"^(19|20)(0[1-9]|[1-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])(-?[0-9]{4})$"))
+        {
+            matching = true;
+            validSsn = true;
+        }
+        else 
+            matching = false;
+        if (matching == true && ssn.Length == 12)
+        {
+            ssn = ssn.Insert(8, "-");
+            validSsn = true;
+        }
+    }
+
     private void ClearErrorMessage()
     {
         errorMessage = "";
