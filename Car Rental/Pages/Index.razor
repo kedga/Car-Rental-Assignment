@@ -15,15 +15,15 @@
 <div class="container">
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @errorMessage
-            <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="ClearErrorMessage">
-            
-            </button>
+        <div class="position-fixed top-2 start-50 translate-middle-x">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @errorMessage
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="ClearErrorMessage"></button>
+            </div>
         </div>
-
     }
 </div>
+
 
 <h2>Vehicles</h2>
 <table class="table table-bordered">
@@ -146,9 +146,18 @@
 
 @* <button type="button" class="btn btn-lg btn-danger" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Popover title" data-bs-placement="bottom" data-bs-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
 <button @onclick="ReinitializePopovers">Reinitialize Popovers</button> *@
+<style>
+    .compact-table {
+        width: auto;
+    }
 
+        .compact-table th,
+        .compact-table td {
+            max-width: none;
+        }
+</style>
 <h2>Customers</h2>
-<table class="table table-bordered table-hover">
+<table class="table table-hover compact-table">
     <thead>
         <tr>
             <th>Personal Identity Number</th>
@@ -159,9 +168,9 @@
     </thead>
     <tbody>
         <tr>
-            <td><input @bind="ssn" @bind:event="oninput" @bind:after="FormatSsn" class="form-control" placeholder="Personal identity number" pattern="^[0-9-]*$" maxlength="13" /></td>
-            <td><input @bind="newCustomer.LastName" class="form-control" placeholder="Last Name" /></td>
-            <td><input @bind="newCustomer.FirstName" class="form-control" placeholder="First Name" /></td>
+            <td><input @bind="ssn" @bind:event="oninput" @bind:after="FormatSsn" class="form-control @(validSsn == true ? "is-valid" : validSsn == false ? "is-invalid" : "")" placeholder="Personal identity number" pattern="^[0-9-]*$" maxlength="13" /></td>
+            <td><input @bind="newCustomer.LastName" class="form-control @(validLastName == true ? "is-valid" : validLastName == false ? "is-invalid" : "")" placeholder="Last Name" /></td>
+            <td><input @bind="newCustomer.FirstName" class="form-control @(validFirstName == true ? "is-valid" : validFirstName == false ? "is-invalid" : "")" placeholder="First Name" /></td>
             <td><button class="btn btn-success" @onclick="AddNewCustomer">Add</button></td>
         </tr>
         @if (Customers != null)
@@ -212,8 +221,10 @@
     double? OdometerPositionNullable;
     double? CostPerKilometerNullable;
     double? DailyRateNullable;
-    string ssn;
-    bool validSsn = false;
+    string ssn = string.Empty;
+    bool? validSsn = null;
+    bool? validFirstName = null;
+    bool? validLastName = null;
     private VehicleType selectedVehicleType;
     string errorMessage = "errormessage is unchanged";
     // private IEnumerable<IBooking> Bookings { get; set; }
@@ -274,25 +285,28 @@
         {
             errorMessage = "Please fill in all required fields.";
         }
-        // else if (!IsSwedishSsnValid(newCustomer.SocialSecurityNumber, out string formattedSsn))
-        // {
-        //     errorMessage = "Please enter a valid Swedish Personal Identity Number in 10 digit format.";
-        // }
+        else if (validSsn != true)
+        {
+            errorMessage = "Please enter a valid Swedish Personal Identity Number.";
+            validSsn = false;
+        }
         else
         {
             newCustomer.SocialSecurityNumber = ssn;
             BookingProcessor.AddDataObject(newCustomer);
             RefreshDataDisplayed();
             newCustomer = new Person("", "", "");
+            ssn = "";
+            validSsn = null;
             errorMessage = BookingProcessor._dataService.GetErrorMessage();
         }
     }
     private void FormatSsn()
     {
-        bool matching = false;
+        validSsn = null;
         if (Regex.IsMatch(ssn, @"^(0[1-9]|[1-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])(-?[0-9]{4})$"))
         {
-            matching = true;
+            validSsn = true;
             int currentYear = DateTime.Now.Year % 100;
             int.TryParse(ssn.Substring(0, 2), out int ssnYear);
             if (ssnYear > currentYear)
@@ -301,17 +315,11 @@
                 ssn = "20" + ssn;
         }
         else if (Regex.IsMatch(ssn, @"^(19|20)(0[1-9]|[1-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])(-?[0-9]{4})$"))
-        {
-            matching = true;
             validSsn = true;
-        }
-        else 
-            matching = false;
-        if (matching == true && ssn.Length == 12)
-        {
+        else
+            validSsn = null;
+        if (validSsn == true && ssn.Length == 12)
             ssn = ssn.Insert(8, "-");
-            validSsn = true;
-        }
     }
 
     private void ClearErrorMessage()
