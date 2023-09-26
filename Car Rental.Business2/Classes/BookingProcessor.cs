@@ -3,35 +3,42 @@ using Car_Rental.Common.Enums;
 using Car_Rental.Common.Interfaces;
 using Car_Rental.Data.Classes;
 using Car_Rental.Data.Interfaces;
+using System.Globalization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Car_Rental.Common.Utilities;
 
 namespace Car_Rental.Business.Classes;
 public class BookingProcessor
 {
-    public readonly IData _dataService;
-    public BookingProcessor(IData dataService) => _dataService = dataService;
-
-    
-    public async Task InitializeDataAsync()
+    private readonly DataValidationService _dataValidation;
+    private readonly DataAccessService _dataAccess;
+    public BookingProcessor(DataValidationService dataValidation, DataAccessService dataAccess)
     {
-        await _dataService.InitializeDataAsync();
-        MatchBookingsWithVehicles();
-        _dataService.PrintDataObjects();
-        await Console.Out.WriteLineAsync("XXXXXXXXX");
-        //SetOdometerPosition();
-        //CalculateTotalCost();
+        _dataValidation = dataValidation;
+        _dataAccess = dataAccess;
     }
-    public IEnumerable<T> GetDataObjectsOfType<T>() where T : class => _dataService.GetDataObjectsOfType<T>();
-    public void AddDataObject(IDataObject dataObject) => _dataService.AddDataObject(dataObject);
+    public DataAccessService DataAccess => _dataAccess;
+    public DataValidationService DataValidation => _dataValidation;
+    public async Task InitializeAsync()
+    {
+        await Console.Out.WriteLineAsync("OnInitializedAsync running");
+        await DataAccess.DataService.InitializeDataAsync();
+        MatchBookingsWithVehicles();
+        MatchBookingsWithCustomers();
+        SetOdometerPosition();
+        CalculateTotalCost();
+        _dataAccess.RefreshData();
+    }
 
     private void MatchBookingsWithVehicles()
     {
-        var bookings = _dataService.GetDataObjectsOfType<IBooking>();
-        var vehicles = _dataService.GetDataObjectsOfType<IVehicle>();
+        var bookings = DataAccess.DataService.GetDataObjectsOfType<IBooking>();
+        var vehicles = DataAccess.DataService.GetDataObjectsOfType<IVehicle>();
 
         var joinedBookings = from booking in bookings
                              join vehicle in vehicles on booking.RegistrationNumber equals vehicle.RegistrationNumber
@@ -42,10 +49,24 @@ public class BookingProcessor
             item.Booking.Vehicle = item.Vehicle;
         }
     }
+    private void MatchBookingsWithCustomers()
+    {
+        var bookings = DataAccess.DataService.GetDataObjectsOfType<IBooking>();
+        var people = DataAccess.DataService.GetDataObjectsOfType<IPerson>();
+
+        var joinedBookings = from booking in bookings
+                             join customer in people on booking.CustomerSsn equals customer.SocialSecurityNumber
+                             select new { Booking = booking, Person = customer };
+
+        foreach (var item in joinedBookings)
+        {
+            item.Booking.Customer = item.Person;
+        }
+    }
 
     private void SetOdometerPosition()
     {
-        var bookings = _dataService.GetDataObjectsOfType<IBooking>();
+        var bookings = DataAccess.DataService.GetDataObjectsOfType<IBooking>();
 
         var groupedBookings = bookings.GroupBy(booking => booking.Vehicle);
 
@@ -55,42 +76,29 @@ public class BookingProcessor
             if (latestBooking != null)
             {
                 latestBooking.Vehicle.OdometerPosition = latestBooking.OdometerEnd;
-                Console.WriteLine($"Updated odometer position for vehicle: {latestBooking.Vehicle.RegistrationNumber}");
-
             }
         }
-        Console.WriteLine("set odometer done");
     }
-
 
     private void CalculateTotalCost()
     {
-        var bookings = _dataService.GetDataObjectsOfType<IBooking>();
+        var bookings = DataAccess.DataService.GetDataObjectsOfType<IBooking>();
 
         foreach (var booking in bookings)
         {
             if (booking.Vehicle != null)
             {
-                double costPerKilometer = booking.Vehicle.CostPerKilometer;
-                double dailyRate = booking.Vehicle.DailyRate;
-                double odometerStart = booking.OdometerStart;
-                double odometerEnd = booking.OdometerEnd;
-
-                int rentalDays = (booking.EndDate - booking.StartDate).Days;
-                double totalKilometerCost = costPerKilometer * (odometerEnd - odometerStart);
-                double totalDailyCost = dailyRate * rentalDays;
+                int rentalDays = booking.EndDate.Duration(booking.StartDate);
+                double totalKilometerCost = booking.Vehicle.CostPerKilometer * (booking.OdometerEnd - booking.OdometerStart);
+                double totalDailyCost = booking.Vehicle.DailyRate * rentalDays;
                 double totalCost = totalKilometerCost + totalDailyCost;
 
                 booking.RentalDays = rentalDays;
-                booking.TotalKilometers = odometerEnd - odometerStart;
-                totalCost = Math.Round(totalCost, 2);
+                booking.TotalKilometers = booking.OdometerEnd - booking.OdometerStart;
                 booking.TotalCost = totalCost;
                 booking.TotalKilometerCost = totalKilometerCost;
                 booking.TotalDailyCost = totalDailyCost;
             }
         }
-
     }
 }
-
-

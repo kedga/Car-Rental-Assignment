@@ -15,9 +15,13 @@ public class Vehicle : IVehicle
 		RegistrationNumber = registrationNumber;
 		Make = make;
 	}
-
-	public string RegistrationNumber { get; set; }
-	public string Make { get; set; }
+    private string _registrationNumber;
+    public string RegistrationNumber
+    {
+        get { return _registrationNumber; }
+        set { _registrationNumber = value.ToUpper(); }
+    }
+    public string Make { get; set; }
 	public double OdometerPosition { get; set; }
     public double? OdometerPositionNullable { get; set; }
     public double CostPerKilometer { get; set; }

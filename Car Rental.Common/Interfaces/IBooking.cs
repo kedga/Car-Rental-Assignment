@@ -11,7 +11,9 @@ namespace Car_Rental.Common.Interfaces;
 public interface IBooking : IDataObject
 {
     string RegistrationNumber { get; set; }
-    string CustomerName { get; }
+    string CustomerSsn { get; }
+    string CustomerFirstName { get; }
+    string CustomerLastName { get; }
     double OdometerStart { get; }
     double OdometerEnd { get; }
     DateTime StartDate { get; }
@@ -23,5 +25,6 @@ public interface IBooking : IDataObject
     double TotalDailyCost { get; set; }
     int RentalDays { get; set; }
     IVehicle Vehicle { get; set; }
+    IPerson Customer { get; set; }
 }
 

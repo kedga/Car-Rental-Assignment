@@ -2,6 +2,7 @@
 @using Car_Rental.Common.Interfaces
 @using Car_Rental.Common.Enums
 @using Car_Rental.Common.Classes
+@using Car_Rental.Common.Utilities
 @using System.Text.Json;
 @using Car_Rental.Business.Classes;
 @using System.Text.RegularExpressions;
@@ -9,31 +10,31 @@
 
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
-@inject Car_Rental.Business.Classes.BookingProcessor BookingProcessor
+@inject Car_Rental.Business.Classes.BookingProcessor bp
 
 <h1>Welcome to Car Rental</h1>
 <div class="container">
-    @if (!string.IsNullOrEmpty(errorMessage))
+    @if (!string.IsNullOrEmpty(bp.DataAccess.errorMessage))
     {
         <div class="position-fixed top-2 start-50 translate-middle-x">
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                @errorMessage
-                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="ClearErrorMessage"></button>
+                @bp.DataAccess.errorMessage
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="bp.DataAccess.ClearErrorMessage"></button>
             </div>
         </div>
     }
+
 </div>
 
-
 <h2>Vehicles</h2>
-<table class="table table-bordered">
+<table class="table compact-table">
     <thead>
         <tr>
-            <th>Vehicle</th>
+            <th>Registration Number</th>
             <th>Make and model</th>
+            <th>Vehicle Type</th>
             <th>Odometer Position</th>
             <th>Cost Per Kilometer</th>
-            <th>Vehicle Type</th>
             <th>Daily Rate</th>
             <th>Rental Status</th>
         </tr>
@@ -41,43 +42,64 @@
     <tbody>
         <!-- Input row for adding a new vehicle -->
         <tr>
-            <td><input @bind="newVehicle.RegistrationNumber" class="form-control" placeholder="Registration Number" /></td>
-            <td><input @bind="newVehicle.Make" class="form-control" placeholder="Make and Model" /></td>
-            <td><input @bind="OdometerPositionNullable" class="form-control" placeholder="Odometer Position" type="number" /></td>
-            <td><input @bind="CostPerKilometerNullable" class="form-control" placeholder="Cost Per Kilometer" type="number" /></td>
+            <td>
+                <input @bind="bp.DataAccess.NewVehicle.RegistrationNumber" @bind:event="oninput"
+                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.NewVehicle.RegistrationNumber, "string", 1))"
+                       placeholder="Registration Number" />
+            </td>
+            <td>
+                <input @bind="bp.DataAccess.NewVehicle.Make" @bind:event="oninput"
+                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.NewVehicle.Make, "string", 1))"
+                       placeholder="Make and Model" />
+            </td>
             <td>
                 <div class="dropdown">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="vehicleTypeDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @newVehicle.VehicleType
+                        @bp.DataAccess.NewVehicle.VehicleType
                     </button>
                     <div class="dropdown-menu" aria-labelledby="vehicleTypeDropdown">
                         @foreach (var vehicleType in Enum.GetValues(typeof(VehicleType)))
                         {
-                            <button class="dropdown-item" @onclick="() => SelectVehicleType((VehicleType)vehicleType)">@vehicleType</button>
+                            <button class="dropdown-item" @onclick="() => bp.DataAccess.SelectVehicleType((VehicleType)vehicleType)">@vehicleType</button>
                         }
                     </div>
                 </div>
-
-
             </td>
-            <td><input @bind="DailyRateNullable" class="form-control" placeholder="Daily Rate" type="number" /></td>
-            <td><input @bind="newVehicle.BookingStatus" class="form-control" placeholder="Booking Status" /></td>
-            <td><button class="btn btn-success" @onclick="AddNewVehicle">Add</button></td>
+            <td>
+                <input @bind="bp.DataAccess.OdometerPositionNullable" @bind:event="oninput"
+                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.OdometerPositionNullable, "number", 1))"
+                       placeholder="Odometer Position"
+                type="number" />
+            </td>
+            <td>
+                <input @bind="bp.DataAccess.CostPerKilometerNullable" @bind:event="oninput"
+                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.CostPerKilometerNullable, "number", 1))"
+                       placeholder="Cost Per Kilometer"
+                type="number" />
+            </td>
+            <td>
+                <input @bind="bp.DataAccess.DailyRateNullable" @bind:event="oninput"
+                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.DailyRateNullable, "number", 1))"
+                       placeholder="Daily Rate" 
+                type="number" />
+            </td>
+            <td><input @bind="bp.DataAccess.NewVehicle.BookingStatus" class="form-control" placeholder="Booking Status" /></td>
+            <td><button class="btn btn-success" @onclick="(e) => bp.DataAccess.AddNewVehicle(1)">Add</button></td>
         </tr>
 
 
         <!-- Existing vehicles -->
-        @if (Vehicles != null)
+        @if (bp.DataAccess.Vehicles != null)
         {
-            @foreach (var vehicle in Vehicles)
+            @foreach (var vehicle in bp.DataAccess.Vehicles)
             {
                 <tr>
                 <td>@vehicle.RegistrationNumber</td>
                 <td>@vehicle.Make</td>
-                <td>@vehicle.OdometerPosition</td>
-                <td>@vehicle.CostPerKilometer</td>
                 <td>@vehicle.VehicleType</td>
-                <td>@vehicle.DailyRate</td>
+                <td>@vehicle.OdometerPosition</td>
+                <td>@vehicle.CostPerKilometer.FormatAsCurrency() / km</td>
+                <td>@vehicle.DailyRate.FormatAsCurrency() / day</td>
                 <td>@vehicle.BookingStatus</td>
             </tr>
             }
@@ -90,7 +112,7 @@
 </table>
 
 <h2>Bookings</h2>
-<table class="table table-bordered">
+<table class="table compact-table">
     <thead>
         <tr>
             <th>Vehicle</th>
@@ -104,31 +126,42 @@
         </tr>
     </thead>
     <tbody>
-        @if (Bookings != null)
+        @if (bp.DataAccess.Bookings != null)
         {
-            @foreach (var booking in Bookings)
+            @foreach (var booking in bp.DataAccess.Bookings)
             {
                 <tr>
                     <td>
                         <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Vehicle Information" data-bs-placement="bottom" data-bs-content="
                             <strong>@booking.Vehicle.Make</strong>, @booking.Vehicle.VehicleType<br>
-                            <strong>Cost per km:</strong> @FormatAsCurrency(@booking.Vehicle.CostPerKilometer)<br>
-                            <strong>Daily rate:</strong> @FormatAsCurrency(@booking.Vehicle.DailyRate)">
+                            <strong>Cost per km:</strong> @booking.Vehicle.CostPerKilometer.FormatAsCurrency()<br>
+                            <strong>Daily rate:</strong> @booking.Vehicle.DailyRate.FormatAsCurrency()
+                        ">
                             @booking.Vehicle.RegistrationNumber
                         </button>
                     </td>
-                    <td>@booking.CustomerName</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Customer Information" data-bs-placement="bottom" data-bs-content="
+                            <strong>First name:</strong> @booking.Customer.FirstName<br>
+                            <strong>Last name:</strong> @booking.Customer.LastName<br>
+                            <strong>Age:</strong> @DateTimeUtils.GetAgeFromSsn(booking.Customer.SocialSecurityNumber)<br>
+                            <strong>Personal Identity Number:</strong> @booking.Customer.SocialSecurityNumber
+                        ">
+                            @booking.Customer.FirstName @booking.Customer.LastName
+                        </button>
+                    </td>
                     <td>@booking.OdometerStart</td>
                     <td>@booking.OdometerEnd</td>
                     <td>@booking.StartDate</td>
                     <td>@booking.EndDate</td>
                     <td>
                         <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Price breakdown" data-bs-placement="bottom" data-bs-content="
-                            <strong>Total km cost for @booking.TotalKilometers km</strong><br>
-                            @FormatAsCurrency(@booking.TotalKilometerCost)<br>
-                            <strong>Total daily cost for @booking.RentalDays days</strong><br>
-                            @FormatAsCurrency(@booking.TotalDailyCost)">
-                            @FormatAsCurrency(@booking.TotalCost)
+                            <strong>Kilometer cost for @booking.TotalKilometers km</strong><br>
+                            @booking.TotalKilometerCost.FormatAsCurrency()<br>
+                            <strong>Daily cost for @booking.RentalDays days</strong><br>
+                            @booking.TotalDailyCost.FormatAsCurrency()
+                        ">
+                            @booking.TotalCost.FormatAsCurrency()
                         </button>
                     </td>
                     <td>@booking.BookingStatus</td>
@@ -157,7 +190,7 @@
         }
 </style>
 <h2>Customers</h2>
-<table class="table table-hover compact-table">
+<table class="table compact-table">
     <thead>
         <tr>
             <th>Personal Identity Number</th>
@@ -168,14 +201,33 @@
     </thead>
     <tbody>
         <tr>
-            <td><input @bind="ssn" @bind:event="oninput" @bind:after="FormatSsn" class="form-control @(validSsn == true ? "is-valid" : validSsn == false ? "is-invalid" : "")" placeholder="Personal identity number" pattern="^[0-9-]*$" maxlength="13" /></td>
-            <td><input @bind="newCustomer.LastName" class="form-control @(validLastName == true ? "is-valid" : validLastName == false ? "is-invalid" : "")" placeholder="Last Name" /></td>
-            <td><input @bind="newCustomer.FirstName" class="form-control @(validFirstName == true ? "is-valid" : validFirstName == false ? "is-invalid" : "")" placeholder="First Name" /></td>
-            <td><button class="btn btn-success" @onclick="AddNewCustomer">Add</button></td>
+            <td>
+                <input @bind="bp.DataAccess.Ssn" @bind:event="oninput"
+                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.ValidSsn, "ssn", 2))"
+                       placeholder="Personal identity number" 
+                pattern="^[0-9-]*$" 
+                maxlength="13" />
+            </td>
+            <td>
+                <input @bind="bp.DataAccess.NewCustomer.LastName" @bind:event="oninput"
+                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.NewCustomer.LastName, "string", 2))"
+                       placeholder="Last Name" />
+            </td>
+            <td>
+                <input @bind="bp.DataAccess.NewCustomer.FirstName" @bind:event="oninput"
+                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.NewCustomer.FirstName, "string", 2))"
+                       placeholder="First Name" />
+            </td>
+            <td>
+                <button class="btn btn-success" 
+                @onclick="(e) => bp.DataAccess.AddNewCustomer(2)">
+                Add
+                </button>
+            </td>
         </tr>
-        @if (Customers != null)
+        @if (bp.DataAccess.Customers != null)
         {
-            @foreach (var customer in Customers)
+            @foreach (var customer in bp.DataAccess.Customers)
             {
                 <tr>
                     <td>@customer.SocialSecurityNumber</td>
@@ -187,146 +239,20 @@
         }
     </tbody>
 </table>
-
-
-<div id="popoverContent" style="display: none;">
-    <table class="table table-bordered">
-        <tr>
-            <th>Attribute</th>
-            <th>Value</th>
-        </tr>
-        <tr>
-            <td>Vehicle Make</td>
-        </tr>
-        <tr>
-            <td>Registration Number</td>
-        </tr>
-        <tr>
-            <td>Cost Per Kilometer</td>
-        </tr>
-        <!-- Add more rows for other attributes -->
-    </table>
-</div>
 <script>
     new bootstrap.Popover(document.body, {
         selector: '[data-bs-toggle="popover"]',
         container: 'body'
         html: true,
     });
-
-</script>
+</script> 
 @code {
-    IVehicle newVehicle = new Vehicle("", "");
-    IPerson newCustomer = new Person("","","");
-    double? OdometerPositionNullable;
-    double? CostPerKilometerNullable;
-    double? DailyRateNullable;
-    string ssn = string.Empty;
-    bool? validSsn = null;
-    bool? validFirstName = null;
-    bool? validLastName = null;
-    private VehicleType selectedVehicleType;
-    string errorMessage = "errormessage is unchanged";
-    // private IEnumerable<IBooking> Bookings { get; set; }
-    // private IEnumerable<IPerson> Customers { get; set; }
-    // private IEnumerable<IVehicle> Vehicles { get; set; }
-    List<IBooking> Bookings = new List<IBooking>();
-    List<IPerson> Customers = new List<IPerson>();
-    List<IVehicle> Vehicles = new List<IVehicle>();
-    string[] dataToLoad = { "vehicles", "people", "bookings" };
     protected override async Task OnInitializedAsync()
     {
-        await BookingProcessor.InitializeDataAsync();
-        RefreshDataDisplayed();
-        errorMessage = BookingProcessor._dataService.GetErrorMessage();
+        await bp.InitializeAsync();
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await JSRuntime.InvokeVoidAsync("reinitializePopovers");
     }
-    private void RefreshDataDisplayed()
-    {
-        Bookings = BookingProcessor.GetDataObjectsOfType<IBooking>().ToList();
-        Customers = BookingProcessor.GetDataObjectsOfType<IPerson>().ToList();
-        Vehicles = BookingProcessor.GetDataObjectsOfType<IVehicle>().ToList();
-    }
-    private void SelectVehicleType(VehicleType vehicleType)
-    {
-        selectedVehicleType = vehicleType;
-        newVehicle.VehicleType = vehicleType;
-    }
-
-    private void AddNewVehicle()
-    {
-        if (string.IsNullOrWhiteSpace(newVehicle.RegistrationNumber) ||
-            string.IsNullOrWhiteSpace(newVehicle.Make) ||
-            OdometerPositionNullable < 0 ||
-            CostPerKilometerNullable <= 0 ||
-            DailyRateNullable <= 0)
-        {
-            errorMessage = "Please fill in all required fields and ensure numeric values are positive.";
-        }
-        else
-        {
-            newVehicle.CostPerKilometer = CostPerKilometerNullable ?? 0.0;
-            newVehicle.DailyRate = DailyRateNullable ?? 0.0;
-            newVehicle.OdometerPosition = OdometerPositionNullable ?? 0.0;
-            BookingProcessor.AddDataObject(newVehicle);
-            RefreshDataDisplayed();
-            newVehicle = new Vehicle("", "");
-            OdometerPositionNullable = CostPerKilometerNullable = DailyRateNullable = null;
-            errorMessage = BookingProcessor._dataService.GetErrorMessage();
-        }
-    }
-    private void AddNewCustomer()
-    {
-        if (string.IsNullOrWhiteSpace(newCustomer.LastName) ||
-            string.IsNullOrWhiteSpace(newCustomer.FirstName))
-        {
-            errorMessage = "Please fill in all required fields.";
-        }
-        else if (validSsn != true)
-        {
-            errorMessage = "Please enter a valid Swedish Personal Identity Number.";
-            validSsn = false;
-        }
-        else
-        {
-            newCustomer.SocialSecurityNumber = ssn;
-            BookingProcessor.AddDataObject(newCustomer);
-            RefreshDataDisplayed();
-            newCustomer = new Person("", "", "");
-            ssn = "";
-            validSsn = null;
-            errorMessage = BookingProcessor._dataService.GetErrorMessage();
-        }
-    }
-    private void FormatSsn()
-    {
-        validSsn = null;
-        if (Regex.IsMatch(ssn, @"^(0[1-9]|[1-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])(-?[0-9]{4})$"))
-        {
-            validSsn = true;
-            int currentYear = DateTime.Now.Year % 100;
-            int.TryParse(ssn.Substring(0, 2), out int ssnYear);
-            if (ssnYear > currentYear)
-                ssn = "19" + ssn;
-            else
-                ssn = "20" + ssn;
-        }
-        else if (Regex.IsMatch(ssn, @"^(19|20)(0[1-9]|[1-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])(-?[0-9]{4})$"))
-            validSsn = true;
-        else
-            validSsn = null;
-        if (validSsn == true && ssn.Length == 12)
-            ssn = ssn.Insert(8, "-");
-    }
-
-    private void ClearErrorMessage()
-    {
-        errorMessage = "";
-    }
-
-
-    public string FormatAsCurrency(double amount) => string.Format("${0:N2}", amount);
-}
+} 

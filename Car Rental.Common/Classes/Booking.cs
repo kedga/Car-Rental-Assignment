@@ -11,14 +11,18 @@ namespace Car_Rental.Common.Classes;
 
 public class Booking : IBooking
 {
-    public Booking(string customerName, string registrationNumber)
-	{
-		CustomerName = customerName;
-		RegistrationNumber = registrationNumber;
+    public Booking(string customerFirstName, string customerLastName, string registrationNumber, string customerSsn)
+    {
+        CustomerFirstName = customerFirstName;
+        CustomerLastName = customerLastName;
+        RegistrationNumber = registrationNumber;
+        CustomerSsn = customerSsn;
     }
-	public string RegistrationNumber { get; set; }
-	public string CustomerName { get; set; }
-	public double OdometerStart { get; set; }
+    public string RegistrationNumber { get; set; }
+    public string CustomerSsn { get; set; }
+    public string CustomerFirstName { get; set; }
+    public string CustomerLastName { get; set; }
+    public double OdometerStart { get; set; }
 	public double OdometerEnd { get; set; }
 	public DateTime StartDate { get; set; }
 	public DateTime EndDate { get; set; }
@@ -29,4 +33,5 @@ public class Booking : IBooking
     public double TotalDailyCost { get; set; }
 	public int RentalDays { get; set; }
     public IVehicle? Vehicle { get; set; }
+    public IPerson Customer { get; set; }
 }

@@ -21,6 +21,7 @@ public class CollectionData : IData
 
     public async Task InitializeDataAsync()
     {
+        await Console.Out.WriteLineAsync("CollectionData.InitializeDataAsync started");
         ProcessDataAndAddToDictionary(await FetchDataAsync<Vehicle>("data/", "vehicles.json"));
         ProcessDataAndAddToDictionary(await FetchDataAsync<Booking>("data/", "bookings.json"));
         ProcessDataAndAddToDictionary(await FetchDataAsync<Person>("data/", "people.json"));
@@ -30,6 +31,7 @@ public class CollectionData : IData
         foreach (var item in data)
         {
             AddDataObject(item);
+            //Console.WriteLine(item);
         }
     }
 
@@ -45,8 +47,7 @@ public class CollectionData : IData
         }
     }
 
-    public IEnumerable<T> GetDataObjectsOfType<T>() =>_dataObjects.TryGetValue(typeof(T), out var data) ? 
-        data!.Cast<T>() : Enumerable.Empty<T>();
+    public IEnumerable<T> GetDataObjectsOfType<T>() =>_dataObjects.TryGetValue(typeof(T), out var data) ? data!.Cast<T>() : Enumerable.Empty<T>();
 
     public void AddDataObject(IDataObject dataObject)
     {
