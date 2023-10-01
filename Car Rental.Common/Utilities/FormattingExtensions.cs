@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Car_Rental.Common.Utilities;
 
 public static class FormattingExtensions
 {
-    public static string FormatAsCurrency(this double amount)
+    public static string FormatAsCurrency(this decimal amount)
     {
         string formattedAmount = amount.ToString("C", CultureInfo.CreateSpecificCulture("fr-FR")); //"sv-SE" is not working properly for some reason
         return formattedAmount.Replace("€", "kr");
@@ -36,4 +31,32 @@ public static class FormattingExtensions
             ssn = ssn.Insert(8, "-");
         return (ssn, validSsn);
     }
+    public static string FormatAsInt(this string inputString)
+    {
+        return Regex.Replace(inputString, "[^0-9]", "");
+    }
+    public static string FormatAsDouble(this string inputString, int maxDecimals = -1)
+    {
+        inputString = inputString.Replace(',', '.');
+        inputString = Regex.Replace(inputString, "[^0-9.]", "");
+
+        int decimalPointIndex = inputString.IndexOf('.');
+
+        if (decimalPointIndex >= 0)
+        {
+            string integralPart = inputString.Substring(0, decimalPointIndex);
+            string fractionalPart = inputString.Substring(decimalPointIndex + 1);
+
+            if (maxDecimals >= 0 && fractionalPart.Length > maxDecimals)
+            {
+                fractionalPart = fractionalPart.Substring(0, maxDecimals);
+            }
+
+            inputString = integralPart + "." + fractionalPart;
+        }
+
+        return inputString;
+    }
+
+
 }

@@ -10,9 +10,8 @@ namespace Car_Rental.Data.Interfaces;
 
 public interface IData
 {
-    Task InitializeDataAsync();
     public IEnumerable<T> GetDataObjectsOfType<T>();
-    string GetErrorMessage();
     public void AddDataObject(IDataObject dataObject);
     public void PrintDataObjects();
+    Task FetchAndAddAsync<T>(string path, string filename) where T : IDataObject;
 }

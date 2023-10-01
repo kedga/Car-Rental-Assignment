@@ -14,18 +14,155 @@
 
 <h1>Welcome to Car Rental</h1>
 <div class="container">
-    @if (!string.IsNullOrEmpty(bp.DataAccess.errorMessage))
+    @if (!string.IsNullOrEmpty(bp.DataManagement.errorMessage))
     {
         <div class="position-fixed top-2 start-50 translate-middle-x">
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                @bp.DataAccess.errorMessage
-                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="bp.DataAccess.ClearErrorMessage"></button>
+                @bp.DataManagement.errorMessage
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="bp.DataManagement.ClearErrorMessage"></button>
             </div>
         </div>
     }
 
 </div>
 
+<h2>Add vehicle</h2>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                    @switch (bp.AddVehicle.PrototypeVehicle.VehicleType)
+                    {
+                        case VehicleType.Sedan:
+                        {
+                            <text>Please enter top speed.</text>
+                            break;
+                        }
+                        case VehicleType.StationWagon:
+                        {
+                            <text>Please enter number of seats.</text>
+                            break;
+                        }
+                        case VehicleType.Van:
+                        {
+                                <text>Please enter cargo capacity in cubic meters.</text>
+                            break;
+                            }
+                        case VehicleType.Motorcycle:
+                            {
+                                <text>Please enter engine size in CCs.</text>
+                                break;
+                            }
+                    }
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @switch (bp.AddVehicle.PrototypeVehicle.VehicleType)
+                {
+                    case VehicleType.Sedan:
+                        if (bp.AddVehicle.PrototypeVehicle is Sedan sedan)
+                        {
+                            <input @bind="sedan.TopSpeed" @bind:event="oninput"
+                                   class="form-control @(DataValidation.ValidateAndReturnCssClass(sedan.TopSpeed, "int", bp.DataManagement.ValidateAggressivelyDict[1]))"
+                                   placeholder="Top Speed km/h" />
+                        }
+                        break;
+                    case VehicleType.StationWagon:
+                        if (bp.AddVehicle.PrototypeVehicle is StationWagon stationWagon)
+                        {
+                            <input @bind="stationWagon.NumberOfSeats" @bind:event="oninput"
+                                   class="form-control @(DataValidation.ValidateAndReturnCssClass(stationWagon.NumberOfSeats, "int", bp.DataManagement.ValidateAggressivelyDict[1]))"
+                                   placeholder="Number of seats" />
+                        }
+                        break;
+                    case VehicleType.Van:
+                        if (bp.AddVehicle.PrototypeVehicle is Van van)
+                        {
+                            <input @bind="van.CargoCapacityCubicMeters" @bind:event="oninput"
+                                   class="form-control @(DataValidation.ValidateAndReturnCssClass(van.CargoCapacityCubicMeters, "double", bp.DataManagement.ValidateAggressivelyDict[1]))"
+                                   placeholder="Cargo capacity in m3" />
+                        }
+                        break;
+                    case VehicleType.Motorcycle:
+                        if (bp.AddVehicle.PrototypeVehicle is Motorcycle motorcycle)
+                        {
+                            <input @bind="motorcycle.EngineSizeCC" @bind:event="oninput"
+                                   class="form-control @(DataValidation.ValidateAndReturnCssClass(motorcycle.EngineSizeCC, "int", bp.DataManagement.ValidateAggressivelyDict[1]))"
+                                   placeholder="Engine size in CCs" />
+                        }
+                        break;
+                    default:
+                        <text>Error, error</text>
+                        break;
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" @onclick="() => bp.AddVehicle.EnterSpecificVehicleData(1)" data-bs-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table compact-table">
+    <thead>
+        <tr>
+            <th>Registration Number</th>
+            <th>Make and model</th>
+            <th>Vehicle Type</th>
+            <th>Odometer Position</th>
+            <th>Cost Per Kilometer</th>
+            <th>Daily Rate</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Input row for adding a new vehicle -->
+        <tr>
+            <td>
+                <input @bind="bp.AddVehicle.PrototypeVehicle.RegistrationNumber" @bind:event="oninput"
+                        class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.PrototypeVehicle.RegistrationNumber, "string", bp.DataManagement.ValidateAggressivelyDict[1]))"
+                        placeholder="Registration Number" />
+            </td>
+            <td>
+                <input @bind="bp.AddVehicle.PrototypeVehicle.Make" @bind:event="oninput"
+                        class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.PrototypeVehicle.Make, "string", bp.DataManagement.ValidateAggressivelyDict[1]))"
+                        placeholder="Make and Model" />
+            </td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="vehicleTypeDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @bp.AddVehicle.PrototypeVehicle.VehicleType
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="vehicleTypeDropdown">
+                        @foreach (var vehicleType in Enum.GetValues(typeof(VehicleType)))
+                        {
+                            <button class="dropdown-item" @onclick="() => bp.AddVehicle.SelectVehicleType((VehicleType)vehicleType)">@vehicleType</button>
+                        }
+                    </div>
+                </div>
+            </td>
+            <td>
+                <input @bind="bp.AddVehicle.OdometerPositionInput" @bind:event="oninput"
+                        class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.OdometerPositionInput, "int", bp.DataManagement.ValidateAggressivelyDict[1]))"
+                        placeholder="Odometer Position" />
+            </td>
+            <td>
+                <input @bind="bp.AddVehicle.CostPerKilometerInput" @bind:event="oninput"
+                        class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.CostPerKilometerInput, "double", bp.DataManagement.ValidateAggressivelyDict[1]))"
+                        placeholder="Cost Per Kilometer" />
+            </td>
+            <td>
+                <input @bind="bp.AddVehicle.DailyRateInput" @bind:event="oninput"
+                        class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.DailyRateInput, "double", bp.DataManagement.ValidateAggressivelyDict[1]))"
+                        placeholder="Daily Rate" />
+            </td>
+            <td><button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="@(bp.AddVehicle.IsDataValid() ? "#staticBackdrop" : "")" @onclick="() => bp.AddVehicle.EnterCommonVehicleData(1)">Add</button></td>
+        </tr>
+    </tbody>
+</table>
 <h2>Vehicles</h2>
 <table class="table compact-table">
     <thead>
@@ -36,71 +173,90 @@
             <th>Odometer Position</th>
             <th>Cost Per Kilometer</th>
             <th>Daily Rate</th>
-            <th>Rental Status</th>
+            <th>Action</th>
+            <th>Status</th>
         </tr>
     </thead>
     <tbody>
-        <!-- Input row for adding a new vehicle -->
-        <tr>
-            <td>
-                <input @bind="bp.DataAccess.NewVehicle.RegistrationNumber" @bind:event="oninput"
-                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.NewVehicle.RegistrationNumber, "string", 1))"
-                       placeholder="Registration Number" />
-            </td>
-            <td>
-                <input @bind="bp.DataAccess.NewVehicle.Make" @bind:event="oninput"
-                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.NewVehicle.Make, "string", 1))"
-                       placeholder="Make and Model" />
-            </td>
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="vehicleTypeDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @bp.DataAccess.NewVehicle.VehicleType
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="vehicleTypeDropdown">
-                        @foreach (var vehicleType in Enum.GetValues(typeof(VehicleType)))
-                        {
-                            <button class="dropdown-item" @onclick="() => bp.DataAccess.SelectVehicleType((VehicleType)vehicleType)">@vehicleType</button>
-                        }
-                    </div>
-                </div>
-            </td>
-            <td>
-                <input @bind="bp.DataAccess.OdometerPositionNullable" @bind:event="oninput"
-                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.OdometerPositionNullable, "number", 1))"
-                       placeholder="Odometer Position"
-                type="number" />
-            </td>
-            <td>
-                <input @bind="bp.DataAccess.CostPerKilometerNullable" @bind:event="oninput"
-                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.CostPerKilometerNullable, "number", 1))"
-                       placeholder="Cost Per Kilometer"
-                type="number" />
-            </td>
-            <td>
-                <input @bind="bp.DataAccess.DailyRateNullable" @bind:event="oninput"
-                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.DailyRateNullable, "number", 1))"
-                       placeholder="Daily Rate" 
-                type="number" />
-            </td>
-            <td><input @bind="bp.DataAccess.NewVehicle.BookingStatus" class="form-control" placeholder="Booking Status" /></td>
-            <td><button class="btn btn-success" @onclick="(e) => bp.DataAccess.AddNewVehicle(1)">Add</button></td>
-        </tr>
-
-
         <!-- Existing vehicles -->
-        @if (bp.DataAccess.Vehicles != null)
+        @if (bp.DataManagement.Vehicles != null)
         {
-            @foreach (var vehicle in bp.DataAccess.Vehicles)
+            @foreach (var vehicle in bp.DataManagement.Vehicles)
             {
                 <tr>
                 <td>@vehicle.RegistrationNumber</td>
                 <td>@vehicle.Make</td>
-                <td>@vehicle.VehicleType</td>
+                <td>
+                    @switch (vehicle.VehicleType)
+                    {
+                        case VehicleType.Sedan:
+                            if (vehicle is Sedan sedan)
+                            {
+                                <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Vehicle Information" data-bs-placement="bottom" data-bs-content="
+                                <strong>Top speed:</strong> @sedan.TopSpeed km/h<br>">
+                                @vehicle.VehicleType
+                                </button>
+                            }
+                            break;
+                        case VehicleType.StationWagon:
+                            if (vehicle is StationWagon stationWagon)
+                            {
+                                <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Vehicle Information" data-bs-placement="bottom" data-bs-content="
+                                <strong>Number of seats:</strong> @stationWagon.NumberOfSeats<br>">
+                                @vehicle.VehicleType
+                                </button>
+                            }
+                            break;
+                        case VehicleType.Van:
+                            if (vehicle is Van van)
+                            {
+                                <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Vehicle Information" data-bs-placement="bottom" data-bs-content="
+                                <strong>Cargo capacity:</strong> @van.CargoCapacityCubicMeters m3<br>">
+                                @vehicle.VehicleType
+                                </button>
+                            }
+                            break;
+                        case VehicleType.Motorcycle:
+                            if (vehicle is Motorcycle motorcycle)
+                            {
+                            <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Vehicle Information" data-bs-placement="bottom" data-bs-content="
+                            <strong>Engine size:</strong> @motorcycle.EngineSizeCC CCs.<br>">
+                            @vehicle.VehicleType
+                            </button>
+                        }
+                        break;
+                    }
+                </td>
                 <td>@vehicle.OdometerPosition</td>
                 <td>@vehicle.CostPerKilometer.FormatAsCurrency() / km</td>
                 <td>@vehicle.DailyRate.FormatAsCurrency() / day</td>
-                <td>@vehicle.BookingStatus</td>
+                <td>
+                    @if (bp.IsRentingMap.TryGetValue(vehicle.RegistrationNumber, out bool value) && value)
+                    {
+                        <input type="text" @bind="bp.DistanceMap[vehicle.LastBookingId]" placeholder="Kilometers driven" />
+                        <button class="btn btn-primary" @onclick="() => bp.ReturnVehicle(vehicle)">Return</button>
+                        
+                    }
+                    else
+                    {
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="customerDropdown-@vehicle.RegistrationNumber" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                @(bp.newBookingsMap.TryGetValue(vehicle, out var associatedPerson) ? $"{associatedPerson.FirstName} {associatedPerson.LastName}" : "Select person")
+                            </button>
+
+                            <div class="dropdown-menu" aria-labelledby="customerDropdown-@vehicle.RegistrationNumber">
+                                @foreach (var person in bp.DataManagement.Customers)
+                                {
+                                    <button class="dropdown-item" @onclick="() => bp.SelectPerson(vehicle, person)">@person.FirstName @person.LastName</button>
+                                }
+                                <button class="dropdown-item" @onclick="() => bp.SelectPerson(vehicle, bp.DefaultPerson)"> - </button>
+                            </div>
+                                <button class="btn btn-outline-secondary" @onclick="() => bp.CreateNewBooking(vehicle)">Rent</button>
+                        </div>
+                            
+                    }
+                </td>
+                    <td><span class="badge @(vehicle.BookingStatus == BookingStatuses.Available ? "text-bg-success" : "text-bg-danger")">@vehicle.BookingStatus</span></td>
             </tr>
             }
         }
@@ -119,16 +275,16 @@
             <th>Customer Name</th>
             <th>Odometer Start</th>
             <th>Odometer End</th>
-            <th>Start Date</th>
-            <th>End Date</th>
+            <th>Rented</th>
+            <th>Returned</th>
             <th>Total Cost</th>
             <th>Booking Status</th>
         </tr>
     </thead>
     <tbody>
-        @if (bp.DataAccess.Bookings != null)
+        @if (bp.DataManagement.Bookings != null)
         {
-            @foreach (var booking in bp.DataAccess.Bookings)
+            @foreach (var booking in bp.DataManagement.Bookings.OrderByDescending(booking => booking.StartDate))
             {
                 <tr>
                     <td>
@@ -144,7 +300,7 @@
                         <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Customer Information" data-bs-placement="bottom" data-bs-content="
                             <strong>First name:</strong> @booking.Customer.FirstName<br>
                             <strong>Last name:</strong> @booking.Customer.LastName<br>
-                            <strong>Age:</strong> @DateTimeUtils.GetAgeFromSsn(booking.Customer.SocialSecurityNumber)<br>
+                            <strong>Age:</strong> @booking.Customer.SocialSecurityNumber.GetAgeFromSsn()<br>
                             <strong>Personal Identity Number:</strong> @booking.Customer.SocialSecurityNumber
                         ">
                             @booking.Customer.FirstName @booking.Customer.LastName
@@ -152,9 +308,12 @@
                     </td>
                     <td>@booking.OdometerStart</td>
                     <td>@booking.OdometerEnd</td>
-                    <td>@booking.StartDate</td>
-                    <td>@booking.EndDate</td>
+                    <td>@booking.StartDate.ToString("yyyy-MM-dd HH:mm")</td>
+
+                    <td>@(booking.EndDate != DateTime.MinValue ? @booking.EndDate.ToString("yyyy-MM-dd HH:mm") : "")</td>
                     <td>
+                        @if (booking.EndDate != DateTime.MinValue)
+                        {
                         <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Price breakdown" data-bs-placement="bottom" data-bs-content="
                             <strong>Kilometer cost for @booking.TotalKilometers km</strong><br>
                             @booking.TotalKilometerCost.FormatAsCurrency()<br>
@@ -163,8 +322,9 @@
                         ">
                             @booking.TotalCost.FormatAsCurrency()
                         </button>
+                        }
                     </td>
-                    <td>@booking.BookingStatus</td>
+                    <td><span class="badge @(booking.BookingStatus == BookingStatuses.Closed ? "text-bg-secondary" : "text-bg-primary")">@booking.BookingStatus</span></td>
                 </tr>
             }
         }
@@ -202,32 +362,32 @@
     <tbody>
         <tr>
             <td>
-                <input @bind="bp.DataAccess.Ssn" @bind:event="oninput"
-                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.ValidSsn, "ssn", 2))"
+                <input @bind="bp.AddCustomer.Ssn" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddCustomer.ValidSsn, "ssn", bp.DataManagement.ValidateAggressivelyDict[2]))"
                        placeholder="Personal identity number" 
                 pattern="^[0-9-]*$" 
                 maxlength="13" />
             </td>
             <td>
-                <input @bind="bp.DataAccess.NewCustomer.LastName" @bind:event="oninput"
-                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.NewCustomer.LastName, "string", 2))"
+                <input @bind="bp.AddCustomer.NewCustomer.LastName" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddCustomer.NewCustomer.LastName, "string", bp.DataManagement.ValidateAggressivelyDict[2]))"
                        placeholder="Last Name" />
             </td>
             <td>
-                <input @bind="bp.DataAccess.NewCustomer.FirstName" @bind:event="oninput"
-                       class="form-control @(bp.DataAccess.DataValidation.ValidateAndReturnCssClass(bp.DataAccess.NewCustomer.FirstName, "string", 2))"
+                <input @bind="bp.AddCustomer.NewCustomer.FirstName" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddCustomer.NewCustomer.FirstName, "string", bp.DataManagement.ValidateAggressivelyDict[2]))"
                        placeholder="First Name" />
             </td>
             <td>
-                <button class="btn btn-success" 
-                @onclick="(e) => bp.DataAccess.AddNewCustomer(2)">
+                <button class="btn btn-outline-secondary"
+                @onclick="() => bp.AddCustomer.CreateNewCustomer(2)">
                 Add
                 </button>
             </td>
         </tr>
-        @if (bp.DataAccess.Customers != null)
+        @if (bp.DataManagement.Customers != null)
         {
-            @foreach (var customer in bp.DataAccess.Customers)
+            @foreach (var customer in bp.DataManagement.Customers)
             {
                 <tr>
                     <td>@customer.SocialSecurityNumber</td>

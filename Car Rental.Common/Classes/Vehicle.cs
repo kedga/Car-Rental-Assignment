@@ -1,18 +1,13 @@
 ﻿using Car_Rental.Common.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Car_Rental.Common.Interfaces;
 
 namespace Car_Rental.Common.Classes;
 
-public class Vehicle : IVehicle
+public class Vehicle : IVehicle, IDataObject
     {
 	public Vehicle(string registrationNumber, string make)
 	{
-		RegistrationNumber = registrationNumber;
+		_registrationNumber = registrationNumber;
 		Make = make;
 	}
     private string _registrationNumber;
@@ -23,11 +18,13 @@ public class Vehicle : IVehicle
     }
     public string Make { get; set; }
 	public double OdometerPosition { get; set; }
-    public double? OdometerPositionNullable { get; set; }
-    public double CostPerKilometer { get; set; }
-    public double? CostPerKilometerNullable { get; set; }
+    public decimal CostPerKilometer { get; set; }
     public VehicleType VehicleType { get; set; }
-    public double DailyRate { get; set; }
-    public double? DailyRateNullable { get; set; }
+    public decimal DailyRate { get; set; }
     public BookingStatuses BookingStatus { get; set; }
+    public int LastBookingId { get; set; }
+    public virtual Dictionary<string, string> UniquePropertiesDict()
+    {
+        return new Dictionary<string, string>();
+    }
 }

@@ -13,9 +13,11 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped<HttpClient>();
 
 builder.Services.AddSingleton<BookingProcessor>();
-builder.Services.AddSingleton<DataValidationService>(); 
-builder.Services.AddSingleton<DataAccessService>();
-builder.Services.AddSingleton<IData, CollectionData>();
+builder.Services.AddSingleton<DataManagementService>();
+builder.Services.AddSingleton<AddCustomer>();
+builder.Services.AddSingleton<AddVehicle>();
+builder.Services.AddSingleton<IData, DataCollection>();
+builder.Services.AddSingleton<IFetchData, FetchDataJson>();
 
 builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

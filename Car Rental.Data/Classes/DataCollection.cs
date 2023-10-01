@@ -1,51 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Car_Rental.Common.Classes;
-using Car_Rental.Common.Enums;
+﻿using Car_Rental.Common.Classes;
 using Car_Rental.Common.Interfaces;
 using Car_Rental.Data.Interfaces;
 
 namespace Car_Rental.Data.Classes;
 
-public class CollectionData : IData
+public class DataCollection : IData
 {
     private Dictionary<Type, List<object>> _dataObjects = new Dictionary<Type, List<object>>();
-    private string _errorMessage = "No errors encountered";
-    private readonly HttpClient _httpClient;
+    private readonly IFetchData _fetchData;
 
-    public CollectionData(HttpClient httpClient) => _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-
-    public async Task InitializeDataAsync()
+    public DataCollection(HttpClient httpClient, IFetchData fetchData)
     {
-        await Console.Out.WriteLineAsync("CollectionData.InitializeDataAsync started");
-        ProcessDataAndAddToDictionary(await FetchDataAsync<Vehicle>("data/", "vehicles.json"));
-        ProcessDataAndAddToDictionary(await FetchDataAsync<Booking>("data/", "bookings.json"));
-        ProcessDataAndAddToDictionary(await FetchDataAsync<Person>("data/", "people.json"));
+        _fetchData = fetchData ?? throw new ArgumentNullException();
     }
-    private void ProcessDataAndAddToDictionary<T>(IEnumerable<T> data) where T : IDataObject
+    public async Task FetchAndAddAsync<T>(string path, string filename) where T : IDataObject
     {
+        IEnumerable<T> data = await _fetchData.FetchDataAsync<T>(path, filename);
+
         foreach (var item in data)
         {
             AddDataObject(item);
-            //Console.WriteLine(item);
         }
     }
 
-    async Task<List<T>> FetchDataAsync<T>(string path, string filename)
-    {
-        try
-        {
-            return await _httpClient.GetFromJsonAsync<List<T>>($"{path}{filename}");
-        }
-        catch (Exception ex)
-        {
-            return null;
-        }
-    }
 
     public IEnumerable<T> GetDataObjectsOfType<T>() =>_dataObjects.TryGetValue(typeof(T), out var data) ? data!.Cast<T>() : Enumerable.Empty<T>();
 
@@ -89,7 +66,4 @@ public class CollectionData : IData
         }
     }
 
-
-
-    public string GetErrorMessage() => _errorMessage;
 }

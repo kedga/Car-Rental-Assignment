@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Car_Rental.Common.Enums;
+﻿using Car_Rental.Common.Enums;
 using Car_Rental.Common.Interfaces;
 
 
@@ -11,27 +6,26 @@ namespace Car_Rental.Common.Classes;
 
 public class Booking : IBooking
 {
-    public Booking(string customerFirstName, string customerLastName, string registrationNumber, string customerSsn)
+    public Booking(IPerson customer, IVehicle vehicle, DateTime startDate)
     {
-        CustomerFirstName = customerFirstName;
-        CustomerLastName = customerLastName;
-        RegistrationNumber = registrationNumber;
-        CustomerSsn = customerSsn;
+        Customer = customer;
+        Vehicle = vehicle;
+        StartDate = startDate;
     }
-    public string RegistrationNumber { get; set; }
-    public string CustomerSsn { get; set; }
-    public string CustomerFirstName { get; set; }
-    public string CustomerLastName { get; set; }
-    public double OdometerStart { get; set; }
-	public double OdometerEnd { get; set; }
-	public DateTime StartDate { get; set; }
-	public DateTime EndDate { get; set; }
-	public BookingStatuses BookingStatus { get; set; }
-    public double TotalKilometers { get; set; }
-    public double TotalCost { get; set; }
-    public double TotalKilometerCost { get; set; }
-    public double TotalDailyCost { get; set; }
-	public int RentalDays { get; set; }
-    public IVehicle? Vehicle { get; set; }
-    public IPerson Customer { get; set; }
+    public int Id { get; set; } = 0;
+    public string RegistrationNumber { get; set; } = string.Empty;
+    public string CustomerSsn { get; set; } = string.Empty;
+    public double OdometerStart { get; set; } = 0.0;
+    public double OdometerEnd { get; set; } = 0.0;
+    public DateTime StartDate { get; set; } = DateTime.MinValue;
+    public DateTime EndDate { get; set; } = DateTime.MinValue;
+    public BookingStatuses BookingStatus { get; set; } = BookingStatuses.Open;
+    public double TotalKilometers { get; set; } = 0.0;
+    public decimal TotalCost { get; set; } = 0.0m;
+    public decimal TotalKilometerCost { get; set; } = 0.0m;
+    public decimal TotalDailyCost { get; set; } = 0.0m;
+    public int RentalDays { get; set; } = 0;
+    public IVehicle Vehicle { get; set; } = new Vehicle("","");
+    public IPerson Customer { get; set; } = new Person("", "", "");
+    
 }

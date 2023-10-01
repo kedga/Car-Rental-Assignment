@@ -1,0 +1,10 @@
+﻿@inherits ComponentBase
+
+<div class="input-group">
+    <input @bind="propertyValue" @bind:event="oninput" class="form-control" placeholder="@propertyPrompt" />
+</div>
+
+@code {
+    [Parameter] public string propertyValue { get; set; }// = "default";
+    [Parameter] public string propertyPrompt { get; set; }// = "default";
+}

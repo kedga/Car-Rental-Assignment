@@ -1,6 +1,6 @@
 [
   {
-    "RegistrationNumber": "ABC123",
+    "RegistrationNumber": "ABC 123",
     "CustomerSsn": "19790401-5678",
     "CustomerFirstName": "xxxx",
     "CustomerLastName": "x",
@@ -8,11 +8,11 @@
     "OdometerEnd": 8000.0,
     "StartDate": "2023-09-01T10:00:00",
     "EndDate": "2023-09-05T14:30:00",
-    "BookingStatus": 1,
+    "BookingStatus": 3,
     "TotalCost": 250.0
   },
   {
-    "RegistrationNumber": "XYZ789",
+    "RegistrationNumber": "XYZ 789",
     "CustomerSsn": "20040715-8765",
     "CustomerFirstName": "xxx",
     "CustomerLastName": "xxxxx",
@@ -20,11 +20,11 @@
     "OdometerEnd": 5000.0,
     "StartDate": "2023-08-25T09:15:00",
     "EndDate": "2023-08-30T16:45:00",
-    "BookingStatus": 0,
+    "BookingStatus": 3,
     "TotalCost": 280.0
   },
   {
-    "RegistrationNumber": "DEF456",
+    "RegistrationNumber": "DEF 456",
     "CustomerSsn": "19630129-4321",
     "CustomerFirstName": "Svxxexxn",
     "CustomerLastName": "x",
@@ -32,7 +32,7 @@
     "OdometerEnd": 8500.0,
     "StartDate": "2023-08-20T14:20:00",
     "EndDate": "2023-08-25T12:30:00",
-    "BookingStatus": 2,
+    "BookingStatus": 3,
     "TotalCost": 180.0
   }
 ]

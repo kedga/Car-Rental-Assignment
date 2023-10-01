@@ -1,6 +1,7 @@
 [
   {
-    "RegistrationNumber": "ABC123",
+    "$type": "Car_Rental.Common.Classes.Vehicle",
+    "RegistrationNumber": "ABC 123",
     "Make": "Toyota Camry",
     "OdometerPosition": 50000,
     "CostPerKilometer": 1.5,
@@ -9,16 +10,18 @@
     "BookingStatus": 0
   },
   {
-    "RegistrationNumber": "XYZ789",
+    "$type": "Car_Rental.Common.Classes.Vehicle",
+    "RegistrationNumber": "XYZ 789",
     "Make": "Ford Transit",
     "OdometerPosition": 60000,
     "CostPerKilometer": 1.2,
     "VehicleType": 1,
     "DailyRate": 350.0,
-    "BookingStatus": 1
+    "BookingStatus": 0
   },
   {
-    "RegistrationNumber": "DEF456",
+    "$type": "Car_Rental.Common.Classes.Vehicle",
+    "RegistrationNumber": "DEF 456",
     "Make": "Harley-Davidson Sportster",
     "OdometerPosition": 15000,
     "CostPerKilometer": 2.0,
@@ -27,12 +30,13 @@
     "BookingStatus": 0
   },
   {
-    "RegistrationNumber": "GHI789",
+    "$type": "Car_Rental.Common.Classes.Vehicle",
+    "RegistrationNumber": "GHI 789",
     "Make": "Subaru Outback",
     "OdometerPosition": 75000,
     "CostPerKilometer": 1.4,
     "VehicleType": 3,
     "DailyRate": 400.0,
-    "BookingStatus": 1
+    "BookingStatus": 0
   }
 ]
