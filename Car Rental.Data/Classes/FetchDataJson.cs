@@ -8,7 +8,7 @@ public class FetchDataJson : IFetchData
     private readonly HttpClient _httpClient;
     public FetchDataJson(HttpClient httpClient) => _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
-    public async Task<List<T>> FetchDataAsync<T>(string path, string filename)
+    public async Task<List<T>?> FetchDataAsync<T>(string path, string filename)
     {
         try
         {

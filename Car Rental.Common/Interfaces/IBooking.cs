@@ -11,7 +11,7 @@ public interface IBooking : IDataObject
     double OdometerEnd { get; set; }
     DateTime StartDate { get; set; }
     DateTime EndDate { get; set; }
-    BookingStatuses BookingStatus { get; set; }
+    BookingStatus BookingStatus { get; set; }
     double TotalKilometers { get; set; }
     decimal TotalCost { get; set; }
     decimal TotalKilometerCost { get; set; }

@@ -11,16 +11,17 @@ namespace Car_Rental.Business.Classes
 {
     public class DataManagementService
     {
+        private string _errorMessage = string.Empty;
+        public event Action DataChanged = delegate { };
         private readonly IData _dataAccess;
         public DataManagementService(IData dataAccess) => _dataAccess = dataAccess;
         public IData DataAccess => _dataAccess;
         public Dictionary<int, bool> ValidateAggressivelyDict { get; set; } = Enumerable.Range(1, 10).ToDictionary(x => x, x => false);
-        public string errorMessage = string.Empty;
         public List<IVehicle> Vehicles { get; set; } = new List<IVehicle>();
         public List<IPerson> Customers { get; set; } = new List<IPerson>();
         public List<IBooking> Bookings { get; set; } = new List<IBooking>();
         public IEnumerable<T> GetDataObjectsOfType<T>() where T : class => _dataAccess.GetDataObjectsOfType<T>();
-        public void ClearErrorMessage() => errorMessage = string.Empty;
+        public void ClearErrorMessage() => _errorMessage = string.Empty;
         public void AddDataObject(IDataObject dataObject) => _dataAccess.AddDataObject(dataObject);
         public async Task InitializeDataAsync()
         {
@@ -40,6 +41,13 @@ namespace Car_Rental.Business.Classes
             }
             Customers = GetDataObjectsOfType<IPerson>().ToList();
             Vehicles = GetDataObjectsOfType<IVehicle>().ToList();
+            DataChanged?.Invoke();
         }
+        public void SetErrorMessage(string message)
+        {
+            _errorMessage = message;
+            DataChanged?.Invoke();
+        }
+        public string GetErrorMessage() => _errorMessage;
     }
 }

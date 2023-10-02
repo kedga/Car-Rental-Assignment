@@ -10,7 +10,6 @@ public interface IVehicle : IDataObject
     decimal CostPerKilometer { get; set; }
     VehicleType VehicleType { get; set; }
     decimal DailyRate { get; set; }
-    BookingStatuses BookingStatus { get; set; }
+    BookingStatus BookingStatus { get; set; }
     int LastBookingId { get; set; }
-    Dictionary<string, string> UniquePropertiesDict();
 }

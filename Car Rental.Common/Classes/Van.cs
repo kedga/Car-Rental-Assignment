@@ -1,10 +1,16 @@
-﻿namespace Car_Rental.Common.Classes;
+﻿using Car_Rental.Common.Utilities;
+
+namespace Car_Rental.Common.Classes;
 
 public class Van : Vehicle
 {
     public Van(string registrationNumber, string make) : base(registrationNumber, make)
     {
     }
-    public string CargoCapacityCubicMeters { get; set; } = string.Empty;
-
+    private string _cargoCapacityCubicMeters = string.Empty;
+    public string CargoCapacityCubicMeters
+    {
+        get { return _cargoCapacityCubicMeters; }
+        set { _cargoCapacityCubicMeters = value.FormatAsDouble(2); }
+    }
 }

@@ -65,6 +65,7 @@ public static class ValidationExtensions
 
     /// <summary>
     /// Checks if a string collides with any string in a collection.
+    /// Ignore any characters not included in the "pattern" parameter.
     /// </summary>
     /// <param name="inputString">The string to check for collisions.</param>
     /// <param name="collection">The collection of strings to check against.</param>

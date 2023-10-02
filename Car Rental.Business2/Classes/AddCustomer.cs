@@ -39,15 +39,15 @@ public class AddCustomer : BaseService
         _dataManagement.ValidateAggressivelyDict[inputGroup] = true;
         if (string.IsNullOrWhiteSpace(NewCustomer.LastName) || string.IsNullOrWhiteSpace(NewCustomer.FirstName))
         {
-            _dataManagement.errorMessage = "Please fill in all required fields.";
+            _dataManagement.SetErrorMessage("Please fill in all required fields.");
         }
         else if (ValidSsn != true)
         {
-            _dataManagement.errorMessage = "Please enter a valid Swedish Personal Identity Number.";
+            _dataManagement.SetErrorMessage("Please enter a valid Swedish Personal Identity Number.");
         }
         else if (Ssn.StringCollisionCheck(DataManagement.Customers.Select(person => person.SocialSecurityNumber)))
         {
-            _dataManagement.errorMessage = "Personal Identity Number already exists.";
+            _dataManagement.SetErrorMessage("Personal Identity Number already exists.");
             Ssn = string.Empty;
         }
         else

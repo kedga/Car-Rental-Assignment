@@ -1,45 +1,46 @@
-﻿using Car_Rental.Common.Utilities;
+﻿using Car_Rental.Common.Enums;
+using Car_Rental.Common.Utilities;
 
 namespace Car_Rental.Business.Classes;
 
 public static class DataValidation
 {
-    public static string ValidateAndReturnCssClass(object? inputData, string type, bool aggressive, string validClass = "is-valid", string invalidClass = "is-invalid", string nullClass = "is-null")
+    public static string ValidateAndReturnCssClass(object? inputData, ValidationType type, bool aggressive, string validClass = "is-valid", string invalidClass = "is-invalid", string nullClass = "is-null")
     {
         string defaultClass = aggressive ? invalidClass : nullClass;
 
         if (inputData == null) return defaultClass;
 
-        string inputString = inputData.ToString();
+        string inputString = inputData.ToString()!;
 
         if (string.IsNullOrEmpty(inputString))
         {
             return defaultClass;
         }
 
-        switch (type.ToLower())
+        switch (type)
         {
-            case "mixed":
-                if (inputData.ToString().HasDigitsAndLetters()) return validClass;
+            case ValidationType.Mixed:
+                if (inputData.ToString()!.HasDigitsAndLetters()) return validClass;
                 break;
 
-            case "int":
+            case ValidationType.Int:
                 if (int.TryParse(inputData.ToString(), out int intValue) && intValue.IsPositive()) return validClass;
                 break;
 
-            case "double":
+            case ValidationType.Double:
                 if (double.TryParse(inputData.ToString(), out double doubleValue) && doubleValue.IsPositive()) return validClass;
                 break;
-
-            case "only letters":
-                if (inputData.ToString().ContainsOnlyLetters()) return validClass;
+                
+            case ValidationType.OnlyLetters:
+                if (inputData.ToString()!.ContainsOnlyLetters()) return validClass;
                 break;
 
-            case "string":
+            case ValidationType.String:
                 if (!string.IsNullOrWhiteSpace(inputData.ToString())) return validClass;
                 break;
 
-            case "ssn":
+            case ValidationType.SSN:
                 if (inputData is bool ssnBool)
                 {
                     if (ssnBool == true) return validClass;
@@ -49,6 +50,16 @@ public static class DataValidation
                 else
                 {
                     return invalidClass;
+                }
+
+            case ValidationType.VehicleType:
+                if (inputData is VehicleType vehicleType && vehicleType is VehicleType.None)
+                {
+                    return defaultClass;
+                }
+                else
+                {
+                    return validClass;
                 }
 
             default:

@@ -19,7 +19,7 @@ public class Booking : IBooking
     public double OdometerEnd { get; set; } = 0.0;
     public DateTime StartDate { get; set; } = DateTime.MinValue;
     public DateTime EndDate { get; set; } = DateTime.MinValue;
-    public BookingStatuses BookingStatus { get; set; } = BookingStatuses.Open;
+    public BookingStatus BookingStatus { get; set; } = BookingStatus.Open;
     public double TotalKilometers { get; set; } = 0.0;
     public decimal TotalCost { get; set; } = 0.0m;
     public decimal TotalKilometerCost { get; set; } = 0.0m;

@@ -47,6 +47,8 @@ public static class FormattingExtensions
             string integralPart = inputString.Substring(0, decimalPointIndex);
             string fractionalPart = inputString.Substring(decimalPointIndex + 1);
 
+            fractionalPart = fractionalPart.Replace(".", "");
+
             if (maxDecimals >= 0 && fractionalPart.Length > maxDecimals)
             {
                 fractionalPart = fractionalPart.Substring(0, maxDecimals);

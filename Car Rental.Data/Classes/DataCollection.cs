@@ -1,5 +1,4 @@
-﻿using Car_Rental.Common.Classes;
-using Car_Rental.Common.Interfaces;
+﻿using Car_Rental.Common.Interfaces;
 using Car_Rental.Data.Interfaces;
 
 namespace Car_Rental.Data.Classes;
@@ -9,17 +8,23 @@ public class DataCollection : IData
     private Dictionary<Type, List<object>> _dataObjects = new Dictionary<Type, List<object>>();
     private readonly IFetchData _fetchData;
 
-    public DataCollection(HttpClient httpClient, IFetchData fetchData)
+    public DataCollection(IFetchData fetchData)
     {
         _fetchData = fetchData ?? throw new ArgumentNullException();
     }
     public async Task FetchAndAddAsync<T>(string path, string filename) where T : IDataObject
     {
-        IEnumerable<T> data = await _fetchData.FetchDataAsync<T>(path, filename);
+        IEnumerable<T>? data = await _fetchData.FetchDataAsync<T>(path, filename);
 
-        foreach (var item in data)
+        if (data != null)
         {
-            AddDataObject(item);
+            foreach (var item in data)
+            {
+                if (item != null)
+                {
+                    AddDataObject(item);
+                }
+            }
         }
     }
 
@@ -28,8 +33,7 @@ public class DataCollection : IData
 
     public void AddDataObject(IDataObject dataObject)
     {
-        if (dataObject == null)
-            throw new ArgumentNullException(nameof(dataObject));
+        if (dataObject == null) throw new ArgumentNullException(nameof(dataObject));
 
         Type objectType = dataObject.GetType();
 

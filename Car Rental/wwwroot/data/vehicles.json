@@ -5,7 +5,7 @@
     "Make": "Toyota Camry",
     "OdometerPosition": 50000,
     "CostPerKilometer": 1.5,
-    "VehicleType": 0,
+    "VehicleType": 1,
     "DailyRate": 300.0,
     "BookingStatus": 0
   },
@@ -15,7 +15,7 @@
     "Make": "Ford Transit",
     "OdometerPosition": 60000,
     "CostPerKilometer": 1.2,
-    "VehicleType": 1,
+    "VehicleType": 2,
     "DailyRate": 350.0,
     "BookingStatus": 0
   },
@@ -25,7 +25,7 @@
     "Make": "Harley-Davidson Sportster",
     "OdometerPosition": 15000,
     "CostPerKilometer": 2.0,
-    "VehicleType": 2,
+    "VehicleType": 3,
     "DailyRate": 250.0,
     "BookingStatus": 0
   },
@@ -35,7 +35,7 @@
     "Make": "Subaru Outback",
     "OdometerPosition": 75000,
     "CostPerKilometer": 1.4,
-    "VehicleType": 3,
+    "VehicleType": 4,
     "DailyRate": 400.0,
     "BookingStatus": 0
   }

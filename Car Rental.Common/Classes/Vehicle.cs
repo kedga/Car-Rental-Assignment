@@ -21,10 +21,6 @@ public class Vehicle : IVehicle, IDataObject
     public decimal CostPerKilometer { get; set; }
     public VehicleType VehicleType { get; set; }
     public decimal DailyRate { get; set; }
-    public BookingStatuses BookingStatus { get; set; }
+    public BookingStatus BookingStatus { get; set; }
     public int LastBookingId { get; set; }
-    public virtual Dictionary<string, string> UniquePropertiesDict()
-    {
-        return new Dictionary<string, string>();
-    }
 }

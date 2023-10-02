@@ -1,0 +1,88 @@
+﻿@inject Car_Rental.Business.Classes.BookingProcessor bp
+@implements IDisposable
+
+<table class="table compact-table">
+    <thead>
+        <tr>
+            <th>Vehicle</th>
+            <th>Customer Name</th>
+            <th>Odometer Start</th>
+            <th>Odometer End</th>
+            <th>Rented</th>
+            <th>Returned</th>
+            <th>Total Cost</th>
+            <th>Booking Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (bp.DataManagement.Bookings != null)
+        {
+            @foreach (var booking in bp.DataManagement.Bookings.OrderByDescending(booking => booking.StartDate))
+            {
+                <tr>
+                    <td>
+                        <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Vehicle Information" data-bs-placement="bottom" data-bs-content="
+                            <strong>@booking.Vehicle.Make</strong>, @booking.Vehicle.VehicleType.DisplayName()<br>
+                            <strong>Cost per km:</strong> @booking.Vehicle.CostPerKilometer.FormatAsCurrency()<br>
+                            <strong>Daily rate:</strong> @booking.Vehicle.DailyRate.FormatAsCurrency()
+                        ">
+                            @booking.Vehicle.RegistrationNumber
+                                </button>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Customer Information" data-bs-placement="bottom" data-bs-content="
+                            <strong>First name:</strong> @booking.Customer.FirstName<br>
+                            <strong>Last name:</strong> @booking.Customer.LastName<br>
+                            <strong>Age:</strong> @booking.Customer.SocialSecurityNumber.GetAgeFromSsn()<br>
+                            <strong>Personal Identity Number:</strong> @booking.Customer.SocialSecurityNumber
+                        ">
+                            @booking.Customer.FirstName @booking.Customer.LastName
+                                </button>
+                    </td>
+                    <td>@booking.OdometerStart</td>
+                    <td>@booking.OdometerEnd</td>
+                    <td>@booking.StartDate.ToString("yyyy-MM-dd HH:mm")</td>
+
+                    <td>@(booking.EndDate != DateTime.MinValue ? @booking.EndDate.ToString("yyyy-MM-dd HH:mm") : "")</td>
+                    <td>
+                        @if (booking.EndDate != DateTime.MinValue)
+                        {
+                            <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Price breakdown" data-bs-placement="bottom" data-bs-content="
+                            <strong>Kilometer cost for @booking.TotalKilometers km</strong><br>
+                            @booking.TotalKilometerCost.FormatAsCurrency()<br>
+                            <strong>Daily cost for @booking.RentalDays days</strong><br>
+                            @booking.TotalDailyCost.FormatAsCurrency()
+                        ">
+                                @booking.TotalCost.FormatAsCurrency()
+                                    </button>
+                        }
+                    </td>
+                    <td><span class="badge @(booking.BookingStatus == BookingStatus.Closed ? "text-bg-secondary" : "text-bg-primary")">@booking.BookingStatus</span></td>
+                </tr>
+            }
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+
+    </tbody>
+</table>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        bp.DataManagement.DataChanged += HandleDataChanged;
+    }
+
+    private void HandleDataChanged()
+    {
+        StateHasChanged();
+    }
+
+    void IDisposable.Dispose()
+    {
+        bp.DataManagement.DataChanged -= HandleDataChanged;
+    }
+}

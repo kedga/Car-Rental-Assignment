@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Car_Rental.Common.Enums;
 
-public enum BookingStatuses
+public enum BookingStatus
 {
 	Available = 0,
 	Booked = 1,
