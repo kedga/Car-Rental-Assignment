@@ -7,11 +7,15 @@ public class StationWagon : Vehicle
     public StationWagon(string registrationNumber, string make) : base(registrationNumber, make)
     {
     }
-    private string _numberOfSeats = string.Empty;
+    public int TowingCapacity { get; set; }
 
-    public string NumberOfSeats
+    public string TowingCapacityInput
     {
-        get { return _numberOfSeats; }
-        set { _numberOfSeats = value.FormatAsInt(); }
+        get
+        {
+            if (TowingCapacity > 0) return TowingCapacity.ToString();
+            else return string.Empty;
+        }
+        set { TowingCapacity = value.FormatAndParseAsInt(); }
     }
 }

@@ -11,7 +11,7 @@ public class BookingProcessor : BaseService
     private readonly AddCustomer _addCustomer;
     private readonly AddVehicle _addVehicle;
 
-    public BookingProcessor(DataManagementService dataManagement, AddCustomer addCustomer, AddVehicle addVehicle) : base(dataManagement)
+    public BookingProcessor(DataManagement dataManagement, AddCustomer addCustomer, AddVehicle addVehicle) : base(dataManagement)
     {
         _addCustomer = addCustomer;
         _addVehicle = addVehicle;
@@ -51,7 +51,7 @@ public class BookingProcessor : BaseService
     }
     public void RefreshData()
     {
-        _dataManagement.RefreshData(); //for debugging purposes
+        _dataManagement.RefreshData();
     }
     private void SetOdometerPosition()
     {

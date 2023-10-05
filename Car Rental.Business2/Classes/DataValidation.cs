@@ -5,6 +5,7 @@ namespace Car_Rental.Business.Classes;
 
 public static class DataValidation
 {
+
     public static string ValidateAndReturnCssClass(object? inputData, ValidationType type, bool aggressive, string validClass = "is-valid", string invalidClass = "is-invalid", string nullClass = "is-null")
     {
         string defaultClass = aggressive ? invalidClass : nullClass;

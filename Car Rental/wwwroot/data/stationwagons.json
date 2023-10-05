@@ -1,0 +1,22 @@
+[
+  {
+    "RegistrationNumber": "GHI 789",
+    "Make": "Subaru Outback",
+    "OdometerPosition": 73442,
+    "CostPerKilometer": 1.4,
+    "VehicleType": 4,
+    "DailyRate": 400.0,
+    "BookingStatus": 0,
+    "TowingCapacity": 2400
+  },
+  {
+    "RegistrationNumber": "MNO 123",
+    "Make": "Volvo V60",
+    "OdometerPosition": 2637,
+    "CostPerKilometer": 1.3,
+    "VehicleType": 4,
+    "DailyRate": 350.0,
+    "BookingStatus": 0,
+    "TowingCapacity": 1800
+  }
+]

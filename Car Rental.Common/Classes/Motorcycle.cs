@@ -7,11 +7,15 @@ public class Motorcycle : Vehicle
     public Motorcycle(string registrationNumber, string make) : base(registrationNumber, make)
     {
     }
-    private string _engineSizeCC = string.Empty;
+    public int EngineSizeCC { get; set; }
 
-    public string EngineSizeCC
+    public string EngineSizeCCInput
     {
-        get { return _engineSizeCC; }
-        set { _engineSizeCC = value.FormatAsInt(); }
+        get
+        {
+            if (EngineSizeCC > 0) return EngineSizeCC.ToString();
+            else return string.Empty;
+        }
+        set { EngineSizeCC = value.FormatAndParseAsInt(); }
     }
 }

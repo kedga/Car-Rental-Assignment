@@ -7,10 +7,19 @@ public class Van : Vehicle
     public Van(string registrationNumber, string make) : base(registrationNumber, make)
     {
     }
-    private string _cargoCapacityCubicMeters = string.Empty;
-    public string CargoCapacityCubicMeters
+    public double CargoCapacity { get; set; }
+
+    private string _cargoCapacityString = string.Empty;
+    public string CargoCapacityInput
     {
-        get { return _cargoCapacityCubicMeters; }
-        set { _cargoCapacityCubicMeters = value.FormatAsDouble(2); }
+        get
+        {
+            return _cargoCapacityString;
+        }
+        set
+        {
+            CargoCapacity = value.FormatAndParseAsDouble(2);
+            _cargoCapacityString = value.FormatAsDouble(2);
+        }
     }
 }

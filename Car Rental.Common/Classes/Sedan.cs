@@ -7,11 +7,15 @@ public class Sedan : Vehicle
     public Sedan(string registrationNumber, string make) : base(registrationNumber, make)
     {
     }
-    private string _topSpeed = string.Empty;
+    public int TopSpeed { get; set; }
 
-    public string TopSpeed
+    public string TopSpeedInput
     {
-        get { return _topSpeed; }
-        set { _topSpeed = value.FormatAsInt(); }
+        get
+        {
+            if (TopSpeed > 0) return TopSpeed.ToString(); 
+            else return string.Empty;
+        }
+        set { TopSpeed = value.FormatAndParseAsInt(); }
     }
 }

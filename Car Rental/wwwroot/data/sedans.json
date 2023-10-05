@@ -1,0 +1,22 @@
+[
+  {
+    "RegistrationNumber": "MYP 00P",
+    "Make": "Toyota Camry",
+    "OdometerPosition": 7152,
+    "CostPerKilometer": 1.5,
+    "VehicleType": 1,
+    "DailyRate": 300.0,
+    "BookingStatus": 0,
+    "TopSpeed": 217
+  },
+  {
+    "RegistrationNumber": "HEK 801",
+    "Make": "Honda Accord",
+    "OdometerPosition": 6233,
+    "CostPerKilometer": 1.6,
+    "VehicleType": 1,
+    "DailyRate": 280.0,
+    "BookingStatus": 0,
+    "TopSpeed": 205
+  } 
+]

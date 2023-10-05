@@ -13,7 +13,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped<HttpClient>();
 
 builder.Services.AddSingleton<BookingProcessor>();
-builder.Services.AddSingleton<DataManagementService>();
+builder.Services.AddSingleton<DataManagement>();
 builder.Services.AddSingleton<AddCustomer>();
 builder.Services.AddSingleton<AddVehicle>();
 builder.Services.AddSingleton<IData, DataCollection>();

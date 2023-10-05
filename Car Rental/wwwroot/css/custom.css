@@ -34,3 +34,6 @@
 .custom-box {
     background-color: lightblue;
 }
+.is-invalid::placeholder {
+    color: #dc3545;
+}

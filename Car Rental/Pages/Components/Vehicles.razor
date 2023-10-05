@@ -1,0 +1,259 @@
+﻿@inject Car_Rental.Business.Classes.BookingProcessor bp
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<style>
+    .datatable {
+        width: 800px; /* Set the desired width in pixels */
+    }
+</style>
+
+
+<table class="table compact-table">
+    <thead>
+        <tr>
+            <th>Registration Number</th>
+            <th>Make and model</th>
+            <th style="min-width: 200px">Vehicle Type</th>
+            <th>Odometer Position</th>
+            <th>Cost Per Kilometer</th>
+            <th>Daily Rate</th>
+            <th>Action</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <input @bind="bp.AddVehicle.PrototypeVehicle.RegistrationNumber" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.PrototypeVehicle.RegistrationNumber, ValidationType.String, bp.DataManagement.ValidateAggressivelyDict[1]))"
+                       size="1"
+                       placeholder="Reg No" />
+            </td>
+            <td>
+                <input @bind="bp.AddVehicle.PrototypeVehicle.Make" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.PrototypeVehicle.Make, ValidationType.String, bp.DataManagement.ValidateAggressivelyDict[1]))"
+                       size="1"
+                       placeholder="Make" />
+            </td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.PrototypeVehicle.VehicleType, ValidationType.VehicleType, bp.DataManagement.ValidateAggressivelyDict[1], "btn-outline-success", "btn-outline-danger", "btn-outline-secondary"))" type="button" id="vehicleTypeDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @bp.AddVehicle.PrototypeVehicle.VehicleType.DisplayName()
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="vehicleTypeDropdown">
+                        @foreach (VehicleType vehicleType in Enum.GetValues(typeof(VehicleType)).Cast<VehicleType>().Skip(1))
+                        {
+                            <button class="dropdown-item" @onclick="() => bp.AddVehicle.SelectVehicleType(vehicleType)">@vehicleType.DisplayName()</button>
+                        }
+
+                        <button class="dropdown-item" @onclick="() => bp.AddVehicle.SelectVehicleType(VehicleType.None)"> - </button>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <input @bind="bp.AddVehicle.OdometerPositionInput" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.OdometerPositionInput, ValidationType.Int, bp.DataManagement.ValidateAggressivelyDict[1]))"
+                       size="1"
+                       placeholder="Odometer" />
+            </td>
+            <td>
+                <input @bind="bp.AddVehicle.CostPerKilometerInput" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.CostPerKilometerInput, ValidationType.Double, bp.DataManagement.ValidateAggressivelyDict[1]))"
+                       size="1"
+                       placeholder="Cost/km" />
+            </td>
+            <td>
+                <input @bind="bp.AddVehicle.DailyRateInput" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddVehicle.DailyRateInput, ValidationType.Double, bp.DataManagement.ValidateAggressivelyDict[1]))"
+                       size="1"
+                       placeholder="Rate" />
+            </td>
+            <td><button class="btn btn-outline-secondary" data-bs-toggle="modal" 
+                data-bs-target="@(bp.AddVehicle.DataIsValid() && bp.AddVehicle.IsRegNoUnique() && bp.AddVehicle.PrototypeVehicle.VehicleType is not VehicleType.None ? "#extraFeatureInput" : "")" @onclick="() => bp.AddVehicle.EnterCommonVehicleData(1)">Add Vehicle
+                </button></td>
+        </tr>
+        @if (bp.DataManagement.Vehicles != null)
+        {
+            @foreach (var vehicle in bp.DataManagement.Vehicles)
+            {
+                <tr>
+                    <td>@vehicle.RegistrationNumber</td>
+                    <td>@vehicle.Make</td>
+                    <td>
+                        @switch (vehicle.VehicleType)
+                        {
+                            case VehicleType.Sedan:
+                                if (vehicle is Sedan sedan)
+                                {
+                                    <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Type Information" data-bs-placement="bottom" data-bs-content="
+                                    <strong>Top speed:</strong> @sedan.TopSpeed km/h<br>">
+                                        @vehicle.VehicleType.DisplayName()
+                                                    </button>
+                                }
+                                break;
+                            case VehicleType.StationWagon:
+                                if (vehicle is StationWagon stationWagon)
+                                {
+                                    <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Type Information" data-bs-placement="bottom" data-bs-content="
+                                    <strong>Towing capacity:</strong> @stationWagon.TowingCapacity kg<br>">
+                                        @vehicle.VehicleType.DisplayName()
+                                                    </button>
+                                }
+                                break;
+                            case VehicleType.Van:
+                                if (vehicle is Van van)
+                                {
+                                    <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Type Information" data-bs-placement="bottom" data-bs-content="
+                                    <strong>Cargo capacity:</strong> @van.CargoCapacity.ToString("N2") m³<br>">
+                                        @vehicle.VehicleType.DisplayName()
+                                                    </button>
+                                }
+                                break;
+                            case VehicleType.Motorcycle:
+                                if (vehicle is Motorcycle motorcycle)
+                                {
+                                    <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Type Information" data-bs-placement="bottom" data-bs-content="
+                                    <strong>Engine size:</strong> @motorcycle.EngineSizeCC cc<br>">
+                                        @vehicle.VehicleType.DisplayName()
+                                                </button>
+                                }
+                                break;
+                        }
+                    </td>
+                    <td>@vehicle.OdometerPosition</td>
+                    <td>@vehicle.CostPerKilometer.FormatAsCurrency() / km</td>
+                    <td>@vehicle.DailyRate.FormatAsCurrency() / day</td>
+                    <td>
+                        @if (bp.IsRentingMap.TryGetValue(vehicle.RegistrationNumber, out bool value) && value)
+                        {
+                            <div style="display: flex; align-items: center;">
+                                <input type="text" @bind="bp.DistanceMap[vehicle.LastBookingId]" placeholder="Kilometers driven" />
+                                <button class="btn btn-primary" style="margin-left: 5px;" @onclick="() => bp.ReturnVehicle(vehicle)">Return</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="dropdown" style="display: flex; align-items: center;">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="customerDropdown-@vehicle.RegistrationNumber" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    @(bp.newBookingsMap.TryGetValue(vehicle, out var associatedPerson) ? $"{associatedPerson.FirstName} {associatedPerson.LastName}" : "Select person")
+                                </button>
+
+                                <div class="dropdown-menu" aria-labelledby="customerDropdown-@vehicle.RegistrationNumber">
+                                    @foreach (var person in bp.DataManagement.Customers)
+                                    {
+                                        <button class="dropdown-item" @onclick="() => bp.SelectPerson(vehicle, person)">@person.FirstName @person.LastName</button>
+                                    }
+                                    <button class="dropdown-item" @onclick="() => bp.SelectPerson(vehicle, bp.DefaultPerson)"> - </button>
+                                </div>
+                                <button class="btn btn-outline-secondary ms-2" @onclick="() => bp.CreateNewBooking(vehicle)">Rent</button>
+                            </div>
+                        }
+                    </td>
+                    <td><span class="badge @(vehicle.BookingStatus == BookingStatus.Available ? "text-bg-success" : "text-bg-danger")">@vehicle.BookingStatus</span></td>
+                </tr>
+            }
+        }
+        else
+        {
+            <text>Loading...</text>
+        }
+    </tbody>
+</table>
+<div class="modal fade" id="extraFeatureInput" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                    @switch (bp.AddVehicle.PrototypeVehicle.VehicleType)
+                    {
+                        case VehicleType.Sedan:
+                            {
+                                Console.WriteLine("VehicleType.Sedan");
+                                <text>Please enter top speed in km/h</text>
+                                break;
+                            }
+                        case VehicleType.StationWagon:
+                            {
+                                Console.WriteLine("VehicleType.StationWagon");
+                                <text>Please enter towing capavity in kg</text>
+                                break;
+                            }
+                        case VehicleType.Van:
+                            {
+                                Console.WriteLine("VehicleType.Van");
+                                <text>Please enter cargo capacity in m³</text>
+                                break;
+                            }
+                        case VehicleType.Motorcycle:
+                            {
+                                Console.WriteLine("VehicleType.Motorcycle");
+                                <text>Please enter engine size in cc</text>
+                                break;
+                            }
+                    }
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @switch (bp.AddVehicle.PrototypeVehicle.VehicleType)
+                {
+                    case VehicleType.Sedan:
+                        if (bp.AddVehicle.PrototypeVehicle is Sedan sedan)
+                        {
+                            <input @bind="sedan.TopSpeedInput" @bind:event="oninput"
+                                   class="form-control @(DataValidation.ValidateAndReturnCssClass(sedan.TopSpeedInput, ValidationType.Int, bp.DataManagement.ValidateAggressivelyDict[1]))"
+                                   placeholder="Top Speed km/h" />
+                        }
+                        break;
+                    case VehicleType.StationWagon:
+                        if (bp.AddVehicle.PrototypeVehicle is StationWagon stationWagon)
+                        {
+                            <input @bind="stationWagon.TowingCapacityInput" @bind:event="oninput"
+                                   class="form-control @(DataValidation.ValidateAndReturnCssClass(stationWagon.TowingCapacityInput, ValidationType.Int, bp.DataManagement.ValidateAggressivelyDict[1]))"
+                                   placeholder="Towing capacity in kg" />
+                        }
+                        break;
+                    case VehicleType.Van:
+                        if (bp.AddVehicle.PrototypeVehicle is Van van)
+                        {
+                            <input @bind="van.CargoCapacityInput" @bind:event="oninput"
+                                   class="form-control @(DataValidation.ValidateAndReturnCssClass(van.CargoCapacityInput, ValidationType.Double, bp.DataManagement.ValidateAggressivelyDict[1]))"
+                                   placeholder="Cargo capacity in m³" />
+                        }
+                        break;
+                    case VehicleType.Motorcycle:
+                        if (bp.AddVehicle.PrototypeVehicle is Motorcycle motorcycle)
+                        {
+                            <input @bind="motorcycle.EngineSizeCCInput" @bind:event="oninput"
+                                   class="form-control @(DataValidation.ValidateAndReturnCssClass(motorcycle.EngineSizeCC, ValidationType.Int, bp.DataManagement.ValidateAggressivelyDict[1]))"
+                                   placeholder="Engine size in cc" />
+                        }
+                        break;
+                    default:
+                        <text>Unrecognized vehicle class</text>
+                        break;
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" @onclick="() => bp.AddVehicle.EnterSpecificVehicleData(1)" data-bs-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        bp.DataManagement.DataChanged += HandleDataChanged;
+    }
+    private void HandleDataChanged()
+    {
+        StateHasChanged();
+    }
+    void IDisposable.Dispose()
+    {
+        bp.DataManagement.DataChanged -= HandleDataChanged;
+    }
+}

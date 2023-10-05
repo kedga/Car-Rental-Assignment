@@ -1,0 +1,22 @@
+[
+  {
+    "RegistrationNumber": "DEF 456",
+    "Make": "Harley-Davidson Sportster",
+    "OdometerPosition": 15036,
+    "CostPerKilometer": 2.0,
+    "VehicleType": 3,
+    "DailyRate": 250.0,
+    "BookingStatus": 0,
+    "EngineSizeCC": 1252
+  },
+  {
+    "RegistrationNumber": "XYZ 123",
+    "Make": "Kawasaki Ninja",
+    "OdometerPosition": 35720,
+    "CostPerKilometer": 1.8,
+    "VehicleType": 3,
+    "DailyRate": 220.0,
+    "BookingStatus": 0,
+    "EngineSizeCC": 998
+  }
+]

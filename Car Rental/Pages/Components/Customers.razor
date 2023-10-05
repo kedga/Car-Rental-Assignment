@@ -1,0 +1,82 @@
+﻿@inject Car_Rental.Business.Classes.BookingProcessor bp
+@implements IDisposable
+
+<style>
+    .compact-table {
+        width: auto;
+    }
+
+        .compact-table th,
+        .compact-table td {
+            max-width: none;
+        }
+</style>
+<table class="table compact-table">
+    <thead>
+        <tr>
+            <th>Personal Identity Number</th>
+            <th style="min-width:10em">Last Name</th>
+            <th style="min-width:10em">First Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <input @bind="bp.AddCustomer.Ssn" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddCustomer.ValidSsn, ValidationType.SSN, bp.DataManagement.ValidateAggressivelyDict[2]))"
+                       placeholder="Identity Number"
+                       maxlength="13"
+                       size="1" />
+            </td>
+            <td>
+                <input @bind="bp.AddCustomer.NewCustomer.FirstName" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddCustomer.NewCustomer.FirstName, ValidationType.String, bp.DataManagement.ValidateAggressivelyDict[2]))"
+                       placeholder="First Name"
+                       size="1" />
+            </td>
+            <td>
+                <input @bind="bp.AddCustomer.NewCustomer.LastName" @bind:event="oninput"
+                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddCustomer.NewCustomer.LastName, ValidationType.String, bp.DataManagement.ValidateAggressivelyDict[2]))"
+                       placeholder="Last Name"
+                       size="1" />
+            </td>
+            <td>
+                <button class="btn btn-outline-secondary"
+                @onclick="() => bp.AddCustomer.CreateNewCustomer(2)">
+                    Add Customer
+                </button>
+            </td>
+        </tr>
+        @if (bp.DataManagement.Customers != null)
+        {
+            @foreach (var customer in bp.DataManagement.Customers)
+            {
+                <tr>
+                    <td>@customer.SocialSecurityNumber</td>
+                    <td>@customer.FirstName</td>
+                    <td>@customer.LastName</td>
+                    <td></td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        bp.DataManagement.DataChanged += HandleDataChanged;
+    }
+
+    private void HandleDataChanged()
+    {
+        StateHasChanged();
+    }
+
+    void IDisposable.Dispose()
+    {
+        bp.DataManagement.DataChanged -= HandleDataChanged;
+    }
+}

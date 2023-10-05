@@ -15,7 +15,7 @@ public class AddCustomer : BaseService
 
     private string _ssn = string.Empty;
 
-    public AddCustomer(DataManagementService dataManagement) : base(dataManagement)
+    public AddCustomer(DataManagement dataManagement) : base(dataManagement)
     {
     }
 

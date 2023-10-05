@@ -1,6 +1,5 @@
 [
   {
-    "$type": "Car_Rental.Common.Classes.Vehicle",
     "RegistrationNumber": "ABC 123",
     "Make": "Toyota Camry",
     "OdometerPosition": 50000,
@@ -10,7 +9,6 @@
     "BookingStatus": 0
   },
   {
-    "$type": "Car_Rental.Common.Classes.Vehicle",
     "RegistrationNumber": "XYZ 789",
     "Make": "Ford Transit",
     "OdometerPosition": 60000,
@@ -20,7 +18,6 @@
     "BookingStatus": 0
   },
   {
-    "$type": "Car_Rental.Common.Classes.Vehicle",
     "RegistrationNumber": "DEF 456",
     "Make": "Harley-Davidson Sportster",
     "OdometerPosition": 15000,
@@ -30,7 +27,6 @@
     "BookingStatus": 0
   },
   {
-    "$type": "Car_Rental.Common.Classes.Vehicle",
     "RegistrationNumber": "GHI 789",
     "Make": "Subaru Outback",
     "OdometerPosition": 75000,

@@ -5,12 +5,12 @@ namespace Car_Rental.Data.Classes;
 
 public class DataCollection : IData
 {
-    private Dictionary<Type, List<object>> _dataObjects = new Dictionary<Type, List<object>>();
+    private Dictionary<Type, List<object>> _dataObjects = new();
     private readonly IFetchData _fetchData;
 
     public DataCollection(IFetchData fetchData)
     {
-        _fetchData = fetchData ?? throw new ArgumentNullException();
+        _fetchData = fetchData ?? throw new ArgumentNullException(nameof(fetchData));
     }
     public async Task FetchAndAddAsync<T>(string path, string filename) where T : IDataObject
     {
@@ -27,7 +27,6 @@ public class DataCollection : IData
             }
         }
     }
-
 
     public IEnumerable<T> GetDataObjectsOfType<T>() =>_dataObjects.TryGetValue(typeof(T), out var data) ? data!.Cast<T>() : Enumerable.Empty<T>();
 

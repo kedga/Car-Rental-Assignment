@@ -1,0 +1,22 @@
+[
+  {
+    "RegistrationNumber": "XYZ 789",
+    "Make": "Ford Transit",
+    "OdometerPosition": 60073,
+    "CostPerKilometer": 1.2,
+    "VehicleType": 2,
+    "DailyRate": 350.0,
+    "BookingStatus": 0,
+    "CargoCapacity": 7.0
+  },
+  {
+    "RegistrationNumber": "JKL 456",
+    "Make": "Mercedes Sprinter",
+    "OdometerPosition": 55438,
+    "CostPerKilometer": 1.4,
+    "VehicleType": 2,
+    "DailyRate": 380.0,
+    "BookingStatus": 0,
+    "CargoCapacity": 8.2
+  }
+]

@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 namespace Car_Rental.Business.Classes;
 public abstract class BaseService
 {
-    protected readonly DataManagementService _dataManagement;
+    protected readonly DataManagement _dataManagement;
 
-    protected BaseService(DataManagementService dataManagement)
+    protected BaseService(DataManagement dataManagement)
     {
         _dataManagement = dataManagement;
     }
-    public DataManagementService DataManagement { get { return _dataManagement; } }
+    public DataManagement DataManagement { get { return _dataManagement; } }
     public void AddDataObject(IDataObject dataObject) => _dataManagement.AddDataObject(dataObject);
 
 }

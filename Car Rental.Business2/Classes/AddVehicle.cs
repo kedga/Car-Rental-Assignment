@@ -7,7 +7,7 @@ namespace Car_Rental.Business.Classes;
 
 public class AddVehicle : BaseService
 {
-    public AddVehicle(DataManagementService dataManagement) : base(dataManagement)
+    public AddVehicle(DataManagement dataManagement) : base(dataManagement)
     {
     }
     private string _odometerPositionInput = string.Empty;
