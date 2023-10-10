@@ -1,0 +1,44 @@
+﻿@switch (vehicle!.VehicleType)
+{
+    case VehicleType.Sedan:
+        if (vehicle is Sedan sedan)
+        {
+            <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Type Information" data-bs-placement="bottom" data-bs-content="
+                                    <strong>Top speed:</strong> @sedan.TopSpeed km/h<br>">
+                @vehicle.VehicleType.DisplayName()
+                                                                </button>
+        }
+        break;
+    case VehicleType.StationWagon:
+        if (vehicle is StationWagon stationWagon)
+        {
+            <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Type Information" data-bs-placement="bottom" data-bs-content="
+                                    <strong>Towing capacity:</strong> @stationWagon.TowingCapacity kg<br>">
+                @vehicle.VehicleType.DisplayName()
+                                                                </button>
+        }
+        break;
+    case VehicleType.Van:
+        if (vehicle is Van van)
+        {
+            <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Type Information" data-bs-placement="bottom" data-bs-content="
+                                    <strong>Cargo capacity:</strong> @van.CargoCapacity.ToString("N2") m³<br>">
+                @vehicle.VehicleType.DisplayName()
+                                                                </button>
+        }
+        break;
+    case VehicleType.Motorcycle:
+        if (vehicle is Motorcycle motorcycle)
+        {
+            <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Type Information" data-bs-placement="bottom" data-bs-content="
+                                    <strong>Engine size:</strong> @motorcycle.EngineSizeCC cc<br>">
+                @vehicle.VehicleType.DisplayName()
+                                                            </button>
+        }
+        break;
+}
+
+@code {
+    [Parameter]
+    public IVehicle? vehicle { get; set; }
+}

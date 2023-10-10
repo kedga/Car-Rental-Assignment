@@ -1,16 +1,6 @@
 ﻿@inject Car_Rental.Business.Classes.BookingProcessor bp
 @implements IDisposable
 
-<style>
-    .compact-table {
-        width: auto;
-    }
-
-        .compact-table th,
-        .compact-table td {
-            max-width: none;
-        }
-</style>
 <table class="table compact-table">
     <thead>
         <tr>
@@ -24,20 +14,20 @@
         <tr>
             <td>
                 <input @bind="bp.AddCustomer.Ssn" @bind:event="oninput"
-                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddCustomer.ValidSsn, ValidationType.SSN, bp.DataManagement.ValidateAggressivelyDict[2]))"
+                       class="form-control @bp.AddCustomer.ValidSsn.ValidateAndReturnCssClass(ValidationType.SSN, bp.StateManagement.ValidateAggressivelyDict[2])"
                        placeholder="Identity Number"
                        maxlength="13"
                        size="1" />
             </td>
             <td>
                 <input @bind="bp.AddCustomer.NewCustomer.FirstName" @bind:event="oninput"
-                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddCustomer.NewCustomer.FirstName, ValidationType.String, bp.DataManagement.ValidateAggressivelyDict[2]))"
+                       class="form-control @bp.AddCustomer.NewCustomer.FirstName.ValidateAndReturnCssClass(ValidationType.String, bp.StateManagement.ValidateAggressivelyDict[2])"
                        placeholder="First Name"
                        size="1" />
             </td>
             <td>
                 <input @bind="bp.AddCustomer.NewCustomer.LastName" @bind:event="oninput"
-                       class="form-control @(DataValidation.ValidateAndReturnCssClass(bp.AddCustomer.NewCustomer.LastName, ValidationType.String, bp.DataManagement.ValidateAggressivelyDict[2]))"
+                       class="form-control @bp.AddCustomer.NewCustomer.LastName.ValidateAndReturnCssClass(ValidationType.String, bp.StateManagement.ValidateAggressivelyDict[2])"
                        placeholder="Last Name"
                        size="1" />
             </td>
@@ -48,9 +38,9 @@
                 </button>
             </td>
         </tr>
-        @if (bp.DataManagement.Customers != null)
+        @if (bp.StateManagement.Customers != null)
         {
-            @foreach (var customer in bp.DataManagement.Customers)
+            @foreach (var customer in bp.StateManagement.Customers)
             {
                 <tr>
                     <td>@customer.SocialSecurityNumber</td>
@@ -67,16 +57,16 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        bp.DataManagement.DataChanged += HandleDataChanged;
+        bp.StateManagement.DataChanged += HandleStateChanged;
     }
 
-    private void HandleDataChanged()
+    private void HandleStateChanged()
     {
         StateHasChanged();
     }
 
     void IDisposable.Dispose()
     {
-        bp.DataManagement.DataChanged -= HandleDataChanged;
+        bp.StateManagement.DataChanged -= HandleStateChanged;
     }
 }

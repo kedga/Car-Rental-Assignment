@@ -15,19 +15,18 @@
         </tr>
     </thead>
     <tbody>
-        @if (bp.DataManagement.Bookings != null)
+        @if (bp.StateManagement.Bookings != null)
         {
-            @foreach (var booking in bp.DataManagement.Bookings.OrderByDescending(booking => booking.StartDate))
+            @foreach (var booking in bp.StateManagement.Bookings.OrderByDescending(booking => booking.StartDate))
             {
                 <tr>
                     <td>
                         <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Vehicle Information" data-bs-placement="bottom" data-bs-content="
                             <strong>@booking.Vehicle.Make</strong>, @booking.Vehicle.VehicleType.DisplayName()<br>
                             <strong>Cost per km:</strong> @booking.Vehicle.CostPerKilometer.FormatAsCurrency()<br>
-                            <strong>Daily rate:</strong> @booking.Vehicle.DailyRate.FormatAsCurrency()
-                        ">
+                            <strong>Daily rate:</strong> @booking.Vehicle.DailyRate.FormatAsCurrency()">
                             @booking.Vehicle.RegistrationNumber
-                                </button>
+                        </button>
                     </td>
                     <td>
                         <button type="button" class="btn btn-outline-info" data-bs-trigger="hover focus" data-bs-toggle="popover" data-bs-title="Customer Information" data-bs-placement="bottom" data-bs-content="
@@ -41,7 +40,6 @@
                     </td>
                     <td>@booking.OdometerStart</td>
                     <td>@booking.OdometerEnd</td>
-                    @* <td>@booking.StartDate.ToString("yyyy-MM-dd HH:mm")</td> *@
                     <td>@booking.StartDate.ToString("yyyy-MM-dd")<br>@booking.StartDate.ToString("HH:mm")</td>
                     <td>
                         @if (booking.EndDate != DateTime.MinValue)
@@ -62,9 +60,9 @@
                             @booking.TotalKilometerCost.FormatAsCurrency()<br>
                             <strong>Daily cost for @booking.RentalDays days</strong><br>
                             @booking.TotalDailyCost.FormatAsCurrency()
-                        ">
+                            ">
                                 @booking.TotalCost.FormatAsCurrency()
-                                    </button>
+                            </button>
                         }
                     </td>
                     <td><span class="badge @(booking.BookingStatus == BookingStatus.Closed ? "text-bg-secondary" : "text-bg-primary")">@booking.BookingStatus</span></td>
@@ -73,7 +71,7 @@
         }
         else
         {
-            <p>Loading...</p>
+            <text>Loading...</text>
         }
 
     </tbody>
@@ -83,16 +81,16 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        bp.DataManagement.DataChanged += HandleDataChanged;
+        bp.StateManagement.DataChanged += HandleStateChanged;
     }
 
-    private void HandleDataChanged()
+    private void HandleStateChanged()
     {
         StateHasChanged();
     }
 
     void IDisposable.Dispose()
     {
-        bp.DataManagement.DataChanged -= HandleDataChanged;
+        bp.StateManagement.DataChanged -= HandleStateChanged;
     }
 }

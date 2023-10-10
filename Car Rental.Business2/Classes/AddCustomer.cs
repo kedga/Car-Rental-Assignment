@@ -1,21 +1,14 @@
 ﻿using Car_Rental.Common.Classes;
 using Car_Rental.Common.Interfaces;
 using Car_Rental.Common.Utilities;
-using Car_Rental.Data.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Car_Rental.Business.Classes;
 
 public class AddCustomer : BaseService
 {
-
     private string _ssn = string.Empty;
 
-    public AddCustomer(DataManagement dataManagement) : base(dataManagement)
+    public AddCustomer(StateManagement stateManagement) : base(stateManagement)
     {
     }
 
@@ -34,32 +27,32 @@ public class AddCustomer : BaseService
     public bool? ValidLastName { get; set; }
     public IPerson NewCustomer { get; set; } = new Person("", "", "");
 
-    public void CreateNewCustomer(int inputGroup)
+    public async Task CreateNewCustomer(int inputGroup)
     {
-        _dataManagement.ValidateAggressivelyDict[inputGroup] = true;
+        _stateManagement.ValidateAggressivelyDict[inputGroup] = true;
         if (string.IsNullOrWhiteSpace(NewCustomer.LastName) || string.IsNullOrWhiteSpace(NewCustomer.FirstName))
         {
-            _dataManagement.SetErrorMessage("Please fill in all required fields.");
+            _stateManagement.SetErrorMessage("Please fill in all required fields.");
         }
         else if (ValidSsn != true)
         {
-            _dataManagement.SetErrorMessage("Please enter a valid Swedish Personal Identity Number.");
+            _stateManagement.SetErrorMessage("Please enter a valid Swedish Personal Identity Number.");
         }
-        else if (Ssn.StringCollisionCheck(DataManagement.Customers.Select(person => person.SocialSecurityNumber)))
+        else if (Ssn.StringCollisionCheck(StateManagement.Customers.Select(person => person.SocialSecurityNumber)))
         {
-            _dataManagement.SetErrorMessage("Personal Identity Number already exists.");
+            _stateManagement.SetErrorMessage("Personal Identity Number already exists.");
             Ssn = string.Empty;
         }
         else
         {
             NewCustomer.SocialSecurityNumber = Ssn;
             AddDataObject(NewCustomer);
-            _dataManagement.RefreshData();
+            await _stateManagement.RefreshData();
             NewCustomer = new Person("", "", "");
             Ssn = string.Empty;
             ValidSsn = null;
-            _dataManagement.ValidateAggressivelyDict[inputGroup] = false;
-            _dataManagement.ClearErrorMessage();
+            _stateManagement.ValidateAggressivelyDict[inputGroup] = false;
+            _stateManagement.ClearErrorMessage();
         }
     }
 }

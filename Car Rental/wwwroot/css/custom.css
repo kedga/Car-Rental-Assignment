@@ -37,3 +37,16 @@
 .is-invalid::placeholder {
     color: #dc3545;
 }
+.sortable-header {
+    cursor: pointer;
+    color: cornflowerblue;
+    text-decoration: underline;
+}
+.compact-table {
+    width: auto;
+}
+
+.compact-table th,
+.compact-table td {
+    max-width: none;
+}

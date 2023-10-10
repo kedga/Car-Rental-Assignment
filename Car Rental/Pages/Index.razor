@@ -7,26 +7,29 @@
 @using Car_Rental.Business.Classes
 @using System.Text.RegularExpressions
 
-
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
 @inject Car_Rental.Business.Classes.BookingProcessor bp
 
-<div style="display: inline-block;">
-    <div class="container">
-        
-        @if (!string.IsNullOrEmpty(bp.DataManagement.GetErrorMessage()))
-        {
-            <div class="position-fixed top-2 start-50 translate-middle-x">
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @bp.DataManagement.GetErrorMessage()
-                    <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="bp.DataManagement.ClearErrorMessage"></button>
-                </div>
+<div class="container">
+    @if (!string.IsNullOrEmpty(bp.StateManagement.GetErrorMessage()))
+    {
+        <div class="position-fixed top-2 start-50 translate-middle-x">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @bp.StateManagement.GetErrorMessage()
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="() => bp.StateManagement.ClearErrorMessage()"></button>
             </div>
-        }
-    </div>
+        </div>
+    }
+</div>
 
-<h1>Car Rental Assignment</h1>
+<div class="d-flex align-items-baseline">
+    <h1 class="me-3">Car Rental</h1>
+    <div class="btn-group" role="group" aria-label="Toggle Link">
+        <a href="#" class="@(bp.AddBooking.IsProcessing ? "text-warning" : bp.AddBooking.UseDelay ? "text-primary" : "text-black-50")" @onclick="bp.AddBooking.ToggleUseDelay">@(bp.AddBooking.UseDelay ? "Booking delay active" : "Booking delay inactive")</a>
+    </div>
+</div>
+
 <div class="mb-5"></div>
 <h4>Vehicles</h4>
 <Vehicles />
@@ -38,28 +41,17 @@
 <Customers />
 <div class="mb-5"></div>
 
-</div>
-
-<script>
-    new bootstrap.Popover(document.body, {
-        selector: '[data-bs-toggle="popover"]',
-        container: 'body',
-        html: true
-    });
-</script> 
-
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        await bp.InitializeAsync();
-        bp.DataManagement.DataChanged += HandleDataChanged;
-        // await JSRuntime.InvokeVoidAsync("DataTablesAdd", "#vehicleTable", new int[] { 6, 7 });
-    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender) 
+        {
+            await bp.InitializeAsync();
+            bp.StateManagement.DataChanged += HandleStateChanged;
+        }
         await JSRuntime.InvokeVoidAsync("reinitializePopovers");
     }
-    private void HandleDataChanged()
+    private void HandleStateChanged()
     {
         StateHasChanged();
     }
