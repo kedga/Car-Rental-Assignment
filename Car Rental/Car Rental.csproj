@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Car Rental.Business2\Car Rental.Business.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="wwwroot\css\app.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -50,6 +46,10 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\data\generated\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Car Rental.Business\Car Rental.Business.csproj" />
   </ItemGroup>
 
 </Project>

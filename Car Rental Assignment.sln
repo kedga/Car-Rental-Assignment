@@ -5,7 +5,7 @@ VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Car Rental", "Car Rental\Car Rental.csproj", "{ACDE8E33-CEB3-47F8-8C88-DD736D0D5A39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Car Rental.Business", "Car Rental.Business2\Car Rental.Business.csproj", "{07DD1434-A461-453F-883E-1680C19F4662}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Car Rental.Business", "Car Rental.Business\Car Rental.Business.csproj", "{07DD1434-A461-453F-883E-1680C19F4662}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Car Rental.Common", "Car Rental.Common\Car Rental.Common.csproj", "{171F235C-624F-4932-AD71-1A8259C55F60}"
 EndProject
