@@ -119,13 +119,8 @@
                     </td>
                     <td><span class="badge @(vehicle.BookingStatus == BookingStatus.Available ? "text-bg-success" : "text-bg-danger")">@vehicle.BookingStatus</span></td>
                     <td>
-                        <button disabled="@bp.AddBooking.IsProcessing" class="btn btn-outline-secondary ms-2" @onclick="() =>
-                            {
-                                if (vehicle.BookingStatus == BookingStatus.Available) 
-                                {
-                                    bp.RemoveDataObject<IVehicle>(v => v.RegistrationNumber == vehicle.RegistrationNumber);
-                                }
-                            }">
+                        <button disabled="@(bp.AddBooking.IsProcessing || vehicle.BookingStatus != BookingStatus.Available)" class="btn btn-outline-secondary ms-2" 
+                        @onclick="() => bp.RemoveDataObject<IVehicle>(v => v.RegistrationNumber == vehicle.RegistrationNumber)">
                             Remove vehicle
                         </button>
                     </td>
