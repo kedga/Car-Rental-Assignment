@@ -119,7 +119,7 @@
                     </td>
                     <td><span class="badge @(vehicle.BookingStatus == BookingStatus.Available ? "text-bg-success" : "text-bg-danger")">@vehicle.BookingStatus</span></td>
                     <td>
-                        <button class="btn btn-outline-secondary ms-2" @onclick="() => 
+                        <button disabled="@bp.AddBooking.IsProcessing" class="btn btn-outline-secondary ms-2" @onclick="() =>
                             {
                                 if (vehicle.BookingStatus == BookingStatus.Available) 
                                 {
