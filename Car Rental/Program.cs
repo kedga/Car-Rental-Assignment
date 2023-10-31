@@ -13,7 +13,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped<HttpClient>();
 
 builder.Services.AddSingleton<BookingProcessor>();
-builder.Services.AddSingleton<IData, FakeDatabase2>();
+builder.Services.AddSingleton<IData, CollectionData>();
 builder.Services.AddSingleton<IFetchData, FetchDataJson>();
 
 builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });

@@ -44,7 +44,7 @@ public class AddBooking
 
         newBooking.Id = _bp.Bookings.Select(x => x.Id).Max() + 1;
 
-        await _bp.Data.Add(newBooking);
+        _bp.Data.Add((IBooking)newBooking);
 
         vehicle.LastBookingId = newBooking.Id;
         DistanceMap.Add(vehicle.LastBookingId, null);

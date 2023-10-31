@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Car_Rental.Data.Classes;
 
-public class FakeDatabase2 : IData
+public class FakeDatabase2 : IData_old
 {
 	private readonly IFetchData _fetchData;
 	public FakeDatabase2(IFetchData fetchData)
@@ -14,8 +14,10 @@ public class FakeDatabase2 : IData
 	}
 	private readonly List<object> _data = new();
 
-    public List<T> Get<T>(Func<T, bool> filter) =>
-    _data.OfType<T>().Where(filter).ToList();
+	public List<T> Get<T>(Func<T, bool>? filter = null) =>
+		filter is null
+		? _data.OfType<T>().ToList()
+        : _data.OfType<T>().Where(filter).ToList();
     public T? Single<T>(Func<T, bool> filter)
     {
         return _data.OfType<T>().Where(filter).FirstOrDefault();

@@ -1,13 +1,11 @@
-﻿using Car_Rental.Common.Interfaces;
-
-namespace Car_Rental.Data.Interfaces
+﻿namespace Car_Rental.Data.Interfaces
 {
     public interface IData
     {
-        Task Add(IDataObject dataObject);
-        List<T> Get<T>(Func<T, bool> filter);
+        void Add<T>(T item) where T : class;
+        List<T> Get<T>(Func<T, bool>? filter) where T : class;
+        T? Single<T>(Func<T, bool>? filter = null) where T : class;
         Task Initialize();
-        void PrintDataObjects();
-        T? Single<T>(Func<T, bool> filter);
+        void Remove<T>(Func<T, bool> predicate) where T : class;
     }
 }

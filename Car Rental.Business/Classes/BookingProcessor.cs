@@ -1,4 +1,5 @@
 ﻿using Car_Rental.Common.Interfaces;
+using Car_Rental.Common.Classes;
 using Car_Rental.Data.Interfaces;
 
 namespace Car_Rental.Business.Classes;
@@ -28,10 +29,15 @@ public class BookingProcessor
     public AddBooking AddBooking => _addBooking;
     public VehicleSorter VehicleSorter => _vehicleSorter;
     public Dictionary<int, bool> ValidateAggressivelyDict { get; set; } = Enumerable.Range(1, 10).ToDictionary(x => x, x => false);
-    public List<IVehicle> Vehicles => _data.Get<IVehicle>(v => true);
-    public List<IPerson> Customers => _data.Get<IPerson>(p => true);
-    public List<IBooking> Bookings => _data.Get<IBooking>(b => true);
-    public void AddDataObject(IDataObject dataObject) => _data.Add(dataObject);
+    public List<IVehicle> Vehicles => _data.Get<IVehicle>(null);
+    public List<IPerson> Customers => _data.Get<IPerson>(null);
+    public List<IBooking> Bookings => _data.Get<IBooking>(null);
+    public void AddDataObject<T>(T dataObject) where T : class => _data.Add(dataObject);
+    public void RemoveDataObject<T>(Func<T, bool> filter) where T : class 
+    { 
+        _data.Remove(filter); 
+        DataChanged.Invoke(); 
+    }
 
     public async Task InitializeAsync()
     {
