@@ -19,19 +19,19 @@
         <tr>
             <td>
                 <input disabled="@bp.AddBooking.IsProcessing" @bind="bp.AddVehicle.PrototypeVehicle.RegistrationNumber" @bind:event="oninput"
-                       class="form-control @bp.AddVehicle.PrototypeVehicle.RegistrationNumber.ValidateAndReturnCssClass(ValidationType.String, bp.StateManagement.ValidateAggressivelyDict[1])"
+                       class="form-control @bp.AddVehicle.PrototypeVehicle.RegistrationNumber.ValidateAndReturnCssClass(ValidationType.String, bp.ValidateAggressivelyDict[1])"
                        size="1"
                        placeholder="Reg No" />
             </td>
             <td>
                 <input disabled="@bp.AddBooking.IsProcessing" @bind="bp.AddVehicle.PrototypeVehicle.Make" @bind:event="oninput"
-                       class="form-control @bp.AddVehicle.PrototypeVehicle.Make.ValidateAndReturnCssClass(ValidationType.String, bp.StateManagement.ValidateAggressivelyDict[1])"
+                       class="form-control @bp.AddVehicle.PrototypeVehicle.Make.ValidateAndReturnCssClass(ValidationType.String, bp.ValidateAggressivelyDict[1])"
                        size="1"
                        placeholder="Make" />
             </td>
             <td>
                 <div class="dropdown">
-                    <button disabled="@bp.AddBooking.IsProcessing" class="btn dropdown-toggle @bp.AddVehicle.PrototypeVehicle.VehicleType.ValidateAndReturnCssClass(ValidationType.VehicleType, bp.StateManagement.ValidateAggressivelyDict[1], "btn-outline-success", "btn-outline-danger", "btn-outline-secondary")" type="button" id="vehicleTypeDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button disabled="@bp.AddBooking.IsProcessing" class="btn dropdown-toggle @bp.AddVehicle.PrototypeVehicle.VehicleType.ValidateAndReturnCssClass(ValidationType.VehicleType, bp.ValidateAggressivelyDict[1], "btn-outline-success", "btn-outline-danger", "btn-outline-secondary")" type="button" id="vehicleTypeDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @bp.AddVehicle.PrototypeVehicle.VehicleType.DisplayName()
                     </button>
                     <div class="dropdown-menu" aria-labelledby="vehicleTypeDropdown">
@@ -46,19 +46,19 @@
             </td>
             <td>
                 <input disabled="@bp.AddBooking.IsProcessing" @bind="bp.AddVehicle.OdometerPositionInput" @bind:event="oninput"
-                       class="form-control @bp.AddVehicle.OdometerPositionInput.ValidateAndReturnCssClass(ValidationType.Int, bp.StateManagement.ValidateAggressivelyDict[1])"
+                       class="form-control @bp.AddVehicle.OdometerPositionInput.ValidateAndReturnCssClass(ValidationType.Int, bp.ValidateAggressivelyDict[1])"
                        size="1"
                        placeholder="Odometer" />
             </td>
             <td>
                 <input disabled="@bp.AddBooking.IsProcessing" @bind="bp.AddVehicle.CostPerKilometerInput" @bind:event="oninput"
-                       class="form-control @bp.AddVehicle.CostPerKilometerInput.ValidateAndReturnCssClass(ValidationType.Double, bp.StateManagement.ValidateAggressivelyDict[1])"
+                       class="form-control @bp.AddVehicle.CostPerKilometerInput.ValidateAndReturnCssClass(ValidationType.Double, bp.ValidateAggressivelyDict[1])"
                        size="1"
                        placeholder="Cost/km" />
             </td>
             <td>
                 <input disabled="@bp.AddBooking.IsProcessing" @bind="bp.AddVehicle.DailyRateInput" @bind:event="oninput"
-                       class="form-control @bp.AddVehicle.DailyRateInput.ValidateAndReturnCssClass(ValidationType.Double, bp.StateManagement.ValidateAggressivelyDict[1])"
+                       class="form-control @bp.AddVehicle.DailyRateInput.ValidateAndReturnCssClass(ValidationType.Double, bp.ValidateAggressivelyDict[1])"
                        size="1"
                        placeholder="Rate" />
             </td>
@@ -78,9 +78,9 @@
             }
 
         </tr>
-        @if (bp.StateManagement.Vehicles != null)
+        @if (bp.Vehicles != null)
         {
-            @foreach (var vehicle in bp.StateManagement.Vehicles)
+            @foreach (var vehicle in bp.VehicleSorter.SortedVehicles)
             {
                 <tr>
                     <td>@vehicle.RegistrationNumber</td>
@@ -107,7 +107,7 @@
                                 </button>
 
                                 <div class="dropdown-menu" aria-labelledby="customerDropdown-@vehicle.RegistrationNumber">
-                                    @foreach (var person in bp.StateManagement.Customers)
+                                    @foreach (var person in bp.Customers)
                                     {
                                         <button class="dropdown-item" @onclick="() => bp.AddBooking.SelectPerson(vehicle, person)">@person.FirstName @person.LastName</button>
                                     }
@@ -136,22 +136,22 @@
                     {
                         case VehicleType.Sedan:
                             {
-                                <text>Please enter top speed in km/h</text>
+                                <text>Please enter Sedan top speed in km/h</text>
                                 break;
                             }
                         case VehicleType.StationWagon:
                             {
-                                <text>Please enter towing capavity in kg</text>
+                                <text>Please enter Station Wagon towing capavity in kg</text>
                                 break;
                             }
                         case VehicleType.Van:
                             {
-                                <text>Please enter cargo capacity in m³</text>
+                                <text>Please enter Van cargo capacity in m³</text>
                                 break;
                             }
                         case VehicleType.Motorcycle:
                             {
-                                <text>Please enter engine size in cc</text>
+                                <text>Please enter Motorcycle engine size in cc</text>
                                 break;
                             }
                     }
@@ -165,7 +165,7 @@
                         if (bp.AddVehicle.PrototypeVehicle is Sedan sedan)
                         {
                             <input @bind="sedan.TopSpeedInput" @bind:event="oninput"
-                            class="form-control @sedan.TopSpeedInput.ValidateAndReturnCssClass(ValidationType.Int, bp.StateManagement.ValidateAggressivelyDict[1])"
+                            class="form-control @sedan.TopSpeedInput.ValidateAndReturnCssClass(ValidationType.Int, bp.ValidateAggressivelyDict[1])"
                             placeholder="Top Speed km/h" />
                         }
                         break;
@@ -173,7 +173,7 @@
                         if (bp.AddVehicle.PrototypeVehicle is StationWagon stationWagon)
                         {
                             <input @bind="stationWagon.TowingCapacityInput" @bind:event="oninput"
-                            class="form-control @stationWagon.TowingCapacityInput.ValidateAndReturnCssClass(ValidationType.Int, bp.StateManagement.ValidateAggressivelyDict[1])"
+                            class="form-control @stationWagon.TowingCapacityInput.ValidateAndReturnCssClass(ValidationType.Int, bp.ValidateAggressivelyDict[1])"
                             placeholder="Towing capacity in kg" />
                         }
                         break;
@@ -181,7 +181,7 @@
                         if (bp.AddVehicle.PrototypeVehicle is Van van)
                         {
                             <input @bind="van.CargoCapacityInput" @bind:event="oninput"
-                            class="form-control @van.CargoCapacityInput.ValidateAndReturnCssClass(ValidationType.Double, bp.StateManagement.ValidateAggressivelyDict[1])"
+                            class="form-control @van.CargoCapacityInput.ValidateAndReturnCssClass(ValidationType.Double, bp.ValidateAggressivelyDict[1])"
                             placeholder="Cargo capacity in m³" />
                         }
                         break;
@@ -189,7 +189,7 @@
                         if (bp.AddVehicle.PrototypeVehicle is Motorcycle motorcycle)
                         {
                             <input @bind="motorcycle.EngineSizeCCInput" @bind:event="oninput"
-                            class="form-control @motorcycle.EngineSizeCCInput.ValidateAndReturnCssClass(ValidationType.Int, bp.StateManagement.ValidateAggressivelyDict[1])"
+                            class="form-control @motorcycle.EngineSizeCCInput.ValidateAndReturnCssClass(ValidationType.Int, bp.ValidateAggressivelyDict[1])"
                             placeholder="Engine size in cc" />
                         }
                         break;
@@ -207,11 +207,10 @@
 </div>
 
 @code {
-    bool showExtraFeatureModal = false;
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        bp.StateManagement.DataChanged += HandleStateChanged;
+        bp.DataChanged += HandleStateChanged;
     }
     private void HandleStateChanged()
     {
@@ -219,6 +218,6 @@
     }
     void IDisposable.Dispose()
     {
-        bp.StateManagement.DataChanged -= HandleStateChanged;
+        bp.DataChanged -= HandleStateChanged;
     }
 }

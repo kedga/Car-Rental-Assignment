@@ -12,12 +12,12 @@
 @inject Car_Rental.Business.Classes.BookingProcessor bp
 
 <div class="container">
-    @if (!string.IsNullOrEmpty(bp.StateManagement.GetErrorMessage()))
+    @if (!string.IsNullOrEmpty(bp.GetErrorMessage()))
     {
         <div class="position-fixed top-2 start-50 translate-middle-x">
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                @bp.StateManagement.GetErrorMessage()
-                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="() => bp.StateManagement.ClearErrorMessage()"></button>
+                @bp.GetErrorMessage()
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close" @onclick="() => bp.ClearErrorMessage()"></button>
             </div>
         </div>
     }
@@ -47,7 +47,7 @@
         if (firstRender) 
         {
             await bp.InitializeAsync();
-            bp.StateManagement.DataChanged += HandleStateChanged;
+            bp.DataChanged += HandleStateChanged;
         }
         await JSRuntime.InvokeVoidAsync("reinitializePopovers");
     }

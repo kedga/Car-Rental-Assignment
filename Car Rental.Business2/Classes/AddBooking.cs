@@ -5,16 +5,19 @@ using Car_Rental.Common.Utilities;
 
 namespace Car_Rental.Business.Classes;
 
-public class AddBooking : BaseService
+public class AddBooking
 {
+    private readonly BookingProcessor _bp;
+
     public Dictionary<IVehicle, IPerson> VehicleToPersonBookingsMap { get; private set; } = new();
     public Dictionary<IVehicle, bool> IsVehicleCurrentlyRentedMap { get; private set; } = new();
     public Dictionary<int, int?> DistanceMap { get; private set; } = new();
     public IPerson DefaultPerson { get; private set; } = new Person("", "Select", "person");
     public bool IsProcessing { get; private set; }
     public bool UseDelay { get; set; } = true;
-    public AddBooking(StateManagement stateManagement) : base(stateManagement)
+    public AddBooking(BookingProcessor bp)
     {
+        _bp = bp;
     }
     public void SelectPerson(IVehicle vehicle, IPerson person)
     {
@@ -26,47 +29,51 @@ public class AddBooking : BaseService
 
         if (associatedPerson.SocialSecurityNumber is "") return;
 
-        _stateManagement.ClearErrorMessage();
+        _bp.ClearErrorMessage();
 
         if (UseDelay)
         {
             IsProcessing = true;
-            await _stateManagement.RefreshData();
+            _bp.RefreshData();
             await Task.Delay(10000);
             IsProcessing = false;
         }
 
         var newBooking = new Booking(associatedPerson, vehicle, DateTime.Now);
         newBooking.OdometerStart = newBooking.OdometerEnd = vehicle.OdometerPosition;
-        AddDataObject(newBooking);
 
-        await _stateManagement.RefreshData(); // add new booking to Bookings and give it an Id
+        newBooking.Id = _bp.Bookings.Select(x => x.Id).Max() + 1;
+
+        await _bp.Data.Add(newBooking);
 
         vehicle.LastBookingId = newBooking.Id;
         DistanceMap.Add(vehicle.LastBookingId, null);
         VehicleToPersonBookingsMap[vehicle] = DefaultPerson;
         IsVehicleCurrentlyRentedMap[vehicle] = true;
-        _stateManagement.Bookings.First(booking => booking.Id == vehicle.LastBookingId).BookingStatus = BookingStatus.Open;
+        var lastBooked = _bp.Data.Single<IBooking>(b => b.Id == vehicle.LastBookingId);
+        if (lastBooked is null) throw new InvalidOperationException("lastBooked is null in CreateNewBooking.");
+        lastBooked.BookingStatus = BookingStatus.Open;
         vehicle.BookingStatus = BookingStatus.Booked;
     }
-    public async Task ReturnVehicle(IVehicle vehicle)
+    public void ReturnVehicle(IVehicle vehicle)
     {
         if (DistanceMap[vehicle.LastBookingId] == null)
         {
-            _stateManagement.SetErrorMessage("Please enter distance driven.");
+            _bp.SetErrorMessage("Please enter distance driven.");
             return;
         }
 
         vehicle.OdometerPosition += (double)DistanceMap[vehicle.LastBookingId]!;
-        var booking = _stateManagement.Bookings.FirstOrDefault(booking => booking.Id == vehicle.LastBookingId)!;
+        var booking = _bp.Data.Single<IBooking>(b => b.Id == vehicle.LastBookingId);
+        if (booking is null) throw new InvalidOperationException("booking is null in ReturnVehicle.");
         booking.EndDate = DateTime.Now;
         booking.OdometerEnd += (double)DistanceMap[vehicle.LastBookingId]!;
         booking.BookingStatus = BookingStatus.Closed;
         booking.Vehicle.BookingStatus = BookingStatus.Available;
         booking.CalculateTotalCost();
-		await _stateManagement.RefreshData();
+		_bp.RefreshData();
         IsVehicleCurrentlyRentedMap[vehicle] = false;
-        _stateManagement.ClearErrorMessage();
+        _bp.ClearErrorMessage();
     }
 	public void ToggleUseDelay()
     {

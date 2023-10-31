@@ -15,9 +15,9 @@
         </tr>
     </thead>
     <tbody>
-        @if (bp.StateManagement.Bookings != null)
+        @if (bp.Bookings != null)
         {
-            @foreach (var booking in bp.StateManagement.Bookings.OrderByDescending(booking => booking.StartDate))
+            @foreach (var booking in bp.Data.Get<IBooking>(b => true).OrderByDescending(b => b.StartDate))
             {
                 <tr>
                     <td>
@@ -81,7 +81,7 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        bp.StateManagement.DataChanged += HandleStateChanged;
+        bp.DataChanged += HandleStateChanged;
     }
 
     private void HandleStateChanged()
@@ -91,6 +91,6 @@
 
     void IDisposable.Dispose()
     {
-        bp.StateManagement.DataChanged -= HandleStateChanged;
+        bp.DataChanged -= HandleStateChanged;
     }
 }

@@ -1,14 +1,11 @@
 ﻿using Car_Rental.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Car_Rental.Data.Interfaces;
 
 namespace Car_Rental.Business.Classes;
 
-public class VehicleSorter : BaseService
+public class VehicleSorter
 {
+	public List<IVehicle> SortedVehicles = new();
 	private string _lastVehicleSortingOption = "registrationnumber";
 	private bool _vehicleSortingDescending = false;
 	private readonly Dictionary<string, Func<IVehicle, object>> _vehicleSortMethodsDict = new Dictionary<string, Func<IVehicle, object>>
@@ -20,10 +17,14 @@ public class VehicleSorter : BaseService
 			{ "costperkilometer", vehicle => vehicle.CostPerKilometer },
 			{ "dailyrate", vehicle => vehicle.DailyRate },
 		};
+    private readonly BookingProcessor _bp;
+    private readonly IData _dataAccess;
 
-    public VehicleSorter(StateManagement stateManagement) : base(stateManagement)
+    public VehicleSorter(BookingProcessor bp, IData dataAccess)
     {
-        stateManagement.DataChanged += () =>
+        _bp = bp;
+        _dataAccess = dataAccess;
+        _bp.DataChanged += () =>
         {
             SortVehicles(_lastVehicleSortingOption, _vehicleSortingDescending);
         };
@@ -48,9 +49,9 @@ public class VehicleSorter : BaseService
 
 		if (_vehicleSortMethodsDict.TryGetValue(propertyName, out var orderByExpression))
 		{
-			_stateManagement.Vehicles = _vehicleSortingDescending ?
-                _stateManagement.Vehicles.OrderByDescending(orderByExpression).ToList() :
-                _stateManagement.Vehicles.OrderBy(orderByExpression).ToList();
+			SortedVehicles = _vehicleSortingDescending ?
+                _bp.Vehicles.OrderByDescending(orderByExpression).ToList() :
+                _bp.Vehicles.OrderBy(orderByExpression).ToList();
 		}
 		else
 		{

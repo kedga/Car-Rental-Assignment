@@ -5,10 +5,12 @@ using Car_Rental.Common.Utilities;
 
 namespace Car_Rental.Business.Classes;
 
-public class AddVehicle : BaseService
+public class AddVehicle
 {
-    public AddVehicle(StateManagement stateManagement) : base(stateManagement)
+    private readonly BookingProcessor _bp;
+    public AddVehicle(BookingProcessor bp)
     {
+        _bp = bp;
     }
     private string _odometerPositionInput = string.Empty;
     public string OdometerPositionInput
@@ -50,7 +52,7 @@ public class AddVehicle : BaseService
     }
     public bool IsRegNoUnique()
     {
-        if (PrototypeVehicle.RegistrationNumber.StringCollisionCheck(StateManagement.Vehicles.Select(vehicle => vehicle.RegistrationNumber), "[A-ZÅÄÖa-zåäö0-9]", true))
+        if (PrototypeVehicle.RegistrationNumber.StringCollisionCheck(_bp.Vehicles.Select(vehicle => vehicle.RegistrationNumber), "[A-ZÅÄÖa-zåäö0-9]", true))
         {
             return false;
         }
@@ -58,24 +60,24 @@ public class AddVehicle : BaseService
     }
     public void EnterCommonVehicleData(int inputGroup)
     {
-        _stateManagement.ValidateAggressivelyDict[inputGroup] = true;
+        _bp.ValidateAggressivelyDict[inputGroup] = true;
 
         if (IsRegNoUnique() is not true)
         {
             PrototypeVehicle.RegistrationNumber = string.Empty;
-            _stateManagement.SetErrorMessage("Registration number already exists.");
+            _bp.SetErrorMessage("Registration number already exists.");
             return;
         }
 
         if (DataIsValid() is not true)
         {
-            _stateManagement.SetErrorMessage("Please fill in all required fields and ensure numeric values are positive.");
+            _bp.SetErrorMessage("Please fill in all required fields and ensure numeric values are positive.");
             return;
         }
 
         if (PrototypeVehicle.VehicleType is VehicleType.None)
         {
-            _stateManagement.SetErrorMessage("Please select a vehicle type.");
+            _bp.SetErrorMessage("Please select a vehicle type.");
             return;
         }
 
@@ -102,17 +104,17 @@ public class AddVehicle : BaseService
         PrototypeVehicle.CostPerKilometer = decimal.TryParse(CostPerKilometerInput, out decimal cpkOut) ? cpkOut : 0.0m;
         PrototypeVehicle.DailyRate = decimal.TryParse(DailyRateInput, out decimal dailyRateOut) ? dailyRateOut : 0.0m;
         PrototypeVehicle.OdometerPosition = double.TryParse(OdometerPositionInput, out double odometerOut) ? odometerOut : 0;
-        _stateManagement.ValidateAggressivelyDict[inputGroup] = false;
+        _bp.ValidateAggressivelyDict[inputGroup] = false;
     }
-    public async Task EnterSpecificVehicleData(int inputGroup)
+    public void EnterSpecificVehicleData(int inputGroup)
     {
-        AddDataObject(PrototypeVehicle);
+        _bp.AddDataObject(PrototypeVehicle);
 
-        await _stateManagement.RefreshData();
+        _bp.RefreshData();
 
         PrototypeVehicle = new Vehicle("", "");
         OdometerPositionInput = CostPerKilometerInput = DailyRateInput = string.Empty;
-        _stateManagement.ValidateAggressivelyDict[inputGroup] = false;
-        _stateManagement.ClearErrorMessage();
+        _bp.ValidateAggressivelyDict[inputGroup] = false;
+        _bp.ClearErrorMessage();
     }
 }
